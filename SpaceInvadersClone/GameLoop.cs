@@ -2,11 +2,14 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using GameLibrary;
+using GameLibrary.Graphics;
 
 namespace SpaceInvadersClone;
 
 public class GameLoop : Core
 {
+    private Sprite _player;
+
     public GameLoop() : base(
         title: "SIC",
         width: 640,
@@ -24,6 +27,17 @@ public class GameLoop : Core
     protected override void LoadContent()
     {
         // TODO: use this.Content to load your game content here
+
+        TextureAtlas atlas = TextureAtlas.FromFile(
+            content: Content,
+            filename: "images/atlas-definition.xml"
+        );
+        const float SCALE = 4.0f;
+
+        _player = atlas.CreateSprite(regionName: "player");
+        _player.Scale = new Vector2(x: SCALE, y: SCALE);
+        _player.CenterOrigin();
+
         base.LoadContent();
     }
 
@@ -42,6 +56,17 @@ public class GameLoop : Core
         GraphicsDevice.Clear(Color.CornflowerBlue);
 
         // TODO: Add your drawing code here
+        const float HALF = 0.5f;
+
+        SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        _player.Draw(
+            spriteBatch: SpriteBatch,
+            position: new Vector2(
+                GraphicsDevice.PresentationParameters.BackBufferWidth * HALF,
+                GraphicsDevice.PresentationParameters.BackBufferHeight * HALF
+            )
+        );
+        SpriteBatch.End();
 
         base.Draw(gameTime);
     }

@@ -2,6 +2,13 @@
 <TextureAtlas>
     <Texture>images/atlas</Texture>
     <Regions>
-        <Region name="player" x="0" y="64" width="15" height="16" />
+        <Region name="player-1" x="0" y="64" width="15" height="16" />
+        <Region name="player-2" x="16" y="64" width="15" height="16" />
     </Regions>
+    <Animations>
+        <Animation name="player-animation" delay="200">
+            <Frame region="player-1" />
+            <Frame region="player-2" />
+        </Animation>
+    </Animations>
 </TextureAtlas>

@@ -8,7 +8,7 @@ namespace SpaceInvadersClone;
 
 public class GameLoop : Core
 {
-    private Sprite _player;
+    private AnimatedSprite _player;
 
     public GameLoop() : base(
         title: "SIC",
@@ -34,7 +34,7 @@ public class GameLoop : Core
         );
         const float SCALE = 4.0f;
 
-        _player = atlas.CreateSprite(regionName: "player");
+        _player = atlas.CreateAnimatedSprite(animationName: "player-animation");
         _player.Scale = new Vector2(x: SCALE, y: SCALE);
         _player.CenterOrigin();
 
@@ -47,6 +47,7 @@ public class GameLoop : Core
             Exit();
 
         // TODO: Add your update logic here
+        _player.Update(gameTime);
 
         base.Update(gameTime);
     }

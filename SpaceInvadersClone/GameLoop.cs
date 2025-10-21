@@ -1,14 +1,21 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using GameLibrary;
 using GameLibrary.Graphics;
+using GameLibrary.Input;
+using System.Globalization;
 
 namespace SpaceInvadersClone;
 
 public class GameLoop : Core
 {
     private AnimatedSprite _player;
+
+    private Vector2 _playerPosition;
+
+    private const float MOVEMENT_SPEED = 5.0f;
 
     public GameLoop() : base(
         title: "SIC",
@@ -43,13 +50,34 @@ public class GameLoop : Core
 
     protected override void Update(GameTime gameTime)
     {
-        if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
-            Exit();
-
         // TODO: Add your update logic here
         _player.Update(gameTime);
 
+        CheckKeyboardInput();
+
         base.Update(gameTime);
+    }
+
+    private void CheckKeyboardInput()
+    {
+        // If the space key is held down, the movement speed increases by 1.5f
+        float speed = MOVEMENT_SPEED;
+        if (Input.Keyboard.IsKeyDown(Keys.Space))
+        {
+            speed *= 1.5f;
+        }
+
+        // If the A or Left keys are down, move the player left on the screen.
+        if (Input.Keyboard.IsKeyDown(Keys.A) || Input.Keyboard.IsKeyDown(Keys.Left))
+        {
+            _playerPosition.X -= speed;
+        }
+
+        // If the D or Right keys are down, move the player right on the screen.
+        if (Input.Keyboard.IsKeyDown(Keys.D) || Input.Keyboard.IsKeyDown(Keys.Right))
+        {
+            _playerPosition.X += speed;
+        }
     }
 
     protected override void Draw(GameTime gameTime)
@@ -59,12 +87,18 @@ public class GameLoop : Core
         // TODO: Add your drawing code here
         const float HALF = 0.5f;
 
+        // Middle of the screen on the x-axis
+        float MiddleX = GraphicsDevice.PresentationParameters.BackBufferWidth * HALF;
+
+        // Middle of the screen on the y-axis
+        float MiddleY = GraphicsDevice.PresentationParameters.BackBufferHeight * HALF;
+
         SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
         _player.Draw(
             spriteBatch: SpriteBatch,
             position: new Vector2(
-                GraphicsDevice.PresentationParameters.BackBufferWidth * HALF,
-                GraphicsDevice.PresentationParameters.BackBufferHeight * HALF
+                _playerPosition.X + MiddleX,
+                _playerPosition.Y + MiddleY
             )
         );
         SpriteBatch.End();

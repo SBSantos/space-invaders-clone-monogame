@@ -1,7 +1,9 @@
 ﻿using System;
+using GameLibrary.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace GameLibrary;
 
@@ -18,13 +20,19 @@ public class Core : Game
     public static GraphicsDeviceManager Graphics { get; private set; }
 
     // Create resources and perform primitive rendering
-    public static new GraphicsDevice GraphicsDevice { get; private set; }  
+    public static new GraphicsDevice GraphicsDevice { get; private set; }
 
     // SpriteBatch for 2D rendering
     public static SpriteBatch SpriteBatch { get; private set; }
 
     // Load global assets
     public static new ContentManager Content { get; private set; }
+
+    // Input manager system
+    public static InputManager Input { get; private set; }
+
+    // Exit the game on ESC key
+    public static bool ExitOnEscape { get; set; }
 
     public Core(string title, int width, int height, bool fullscreen)
     {
@@ -51,6 +59,8 @@ public class Core : Game
         Content.RootDirectory = "Content";
 
         IsMouseVisible = true;
+
+        ExitOnEscape = true;
     }
 
     protected override void Initialize()
@@ -62,5 +72,21 @@ public class Core : Game
 
         // Create a SpriteBatch instance
         SpriteBatch = new(GraphicsDevice);
+
+        // Create a new InputManager
+        Input = new();
+    }
+
+    protected override void Update(GameTime gameTime)
+    {
+        // Update the input manager.
+        Input.Update(gameTime);
+
+        if (ExitOnEscape && Input.Keyboard.IsKeyDown(Keys.Escape))
+        {
+            Exit();
+        }
+
+        base.Update(gameTime);
     }
 }

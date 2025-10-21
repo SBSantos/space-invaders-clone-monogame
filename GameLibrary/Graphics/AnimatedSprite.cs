@@ -44,7 +44,7 @@ public class AnimatedSprite : Sprite
     {
         _elapsed += gameTime.ElapsedGameTime;
 
-        if (_elapsed >= -_animation.Delay)
+        if (_elapsed >= _animation.Delay)
         {
             _elapsed -= _animation.Delay;
             _currentFrame++;

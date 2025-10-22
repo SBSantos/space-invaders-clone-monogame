@@ -39,7 +39,7 @@ public class GameLoop : Core
             content: Content,
             filename: "images/atlas-definition.xml"
         );
-        const float SCALE = 4.0f;
+        const float SCALE = 10.0f;
 
         _player = atlas.CreateAnimatedSprite(animationName: "player-animation");
         _player.Scale = new Vector2(x: SCALE, y: SCALE);
@@ -60,6 +60,9 @@ public class GameLoop : Core
 
     private void CheckKeyboardInput()
     {
+        // Stops the animation until an action occurs.
+        _player.StopAnimation();
+
         // If the space key is held down, the movement speed increases by 1.5f
         float speed = MOVEMENT_SPEED;
         if (Input.Keyboard.IsKeyDown(Keys.Space))
@@ -67,15 +70,17 @@ public class GameLoop : Core
             speed *= 1.5f;
         }
 
-        // If the A or Left keys are down, move the player left on the screen.
+        // If the A or Left keys are down, play the animation and move the player left on the screen.
         if (Input.Keyboard.IsKeyDown(Keys.A) || Input.Keyboard.IsKeyDown(Keys.Left))
         {
+            _player.PlayAnimation();
             _playerPosition.X -= speed;
         }
 
-        // If the D or Right keys are down, move the player right on the screen.
+        // If the D or Right keys are down, play the animation and move the player right on the screen.
         if (Input.Keyboard.IsKeyDown(Keys.D) || Input.Keyboard.IsKeyDown(Keys.Right))
         {
+            _player.PlayAnimation();
             _playerPosition.X += speed;
         }
     }

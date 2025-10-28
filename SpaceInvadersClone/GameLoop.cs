@@ -138,15 +138,13 @@ public class GameLoop : Core
             speed *= 1.5f;
         }
 
-        // If the A or Left keys are down, play the animation and move the player left on the screen.
-        if (Input.Keyboard.IsKeyDown(Keys.A) || Input.Keyboard.IsKeyDown(Keys.Left))
+        if (GameController.MoveLeft())
         {
             _player.PlayAnimation();
             _playerPosition.X -= speed;
         }
 
-        // If the D or Right keys are down, play the animation and move the player right on the screen.
-        if (Input.Keyboard.IsKeyDown(Keys.D) || Input.Keyboard.IsKeyDown(Keys.Right))
+        if (GameController.MoveRight())
         {
             _player.PlayAnimation();
             _playerPosition.X += speed;

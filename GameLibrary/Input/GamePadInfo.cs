@@ -87,7 +87,7 @@ public class GamePadInfo
     /// </summary>
     /// <param name="button">The gamepad button to check.</param>
     /// <returns>True if the specified gamepad button is currently down; Otherwise, false.</returns>
-    public bool IsKeyDown(Buttons button)
+    public bool IsButtonDown(Buttons button)
     {
         return CurrentState.IsButtonDown(button);
     }
@@ -97,7 +97,7 @@ public class GamePadInfo
     /// </summary>
     /// <param name="button">The gamepad button to check.</param>
     /// <returns>True if the specified gamepad button is currently up; Otherwise, false.</returns>
-    public bool IsKeyUp(Buttons button)
+    public bool IsButtonUp(Buttons button)
     {
         return CurrentState.IsButtonUp(button);
     }
@@ -107,7 +107,7 @@ public class GamePadInfo
     /// </summary>
     /// <param name="button">The gamepad button to check.</param>
     /// <returns>True if the specified gamepad button was just pressed on the current frame; Otherwise, false.</returns>
-    public bool WasKeyJustPressed(Buttons button)
+    public bool WasButtonJustPressed(Buttons button)
     {
         return CurrentState.IsButtonDown(button)
             && PreviousState.IsButtonUp(button);
@@ -118,7 +118,7 @@ public class GamePadInfo
     /// </summary>
     /// <param name="button">The gamepad button to check.</param>
     /// <returns>True if the specified gamepad button was just released on the current frame; Otherwise, false.</returns>
-    public bool WasKeyJustReleased(Buttons button)
+    public bool WasButtonJustReleased(Buttons button)
     {
         return CurrentState.IsButtonUp(button)
             && PreviousState.IsButtonDown(button);

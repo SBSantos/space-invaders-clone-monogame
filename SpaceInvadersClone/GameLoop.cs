@@ -47,13 +47,13 @@ public class GameLoop : Core
         );
         _player.Initialize(playerPosition);
 
-        int croachColumn = (int)(_tilemap.Columns / DESIRED_ROW);
+        int roachColumn = (int)(_tilemap.Columns / DESIRED_ROW);
 
-        Vector2 croachPosition = new(
-            croachColumn * _tilemap.TileWidth,
+        Vector2 roachPosition = new(
+            roachColumn * _tilemap.TileWidth,
             row * _tilemap.TileHeight
         );
-        _roach.Initialize(croachPosition);
+        _roach.Initialize(roachPosition);
     }
 
     protected override void LoadContent()

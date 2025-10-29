@@ -1,28 +1,19 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using GameLibrary;
 using GameLibrary.Graphics;
-using GameLibrary.Input;
+using SpaceInvadersClone.GameObjects;
 
 namespace SpaceInvadersClone;
 
 public class GameLoop : Core
 {
-    private AnimatedSprite _player;
-    private AnimatedSprite _croach;
-
-    private Vector2 _playerPosition;
-    private Vector2 _resetPlayerPosition;
-
-    private Vector2 _croachPosition;
+    private Player _player;
+    private Roach _roach;
 
     private Tilemap _tilemap;
 
     private Rectangle _roomBounds;
-
-    private const float MOVEMENT_SPEED = 5.0f;
 
     public GameLoop() : base(
         title: "SIC",
@@ -49,17 +40,20 @@ public class GameLoop : Core
         const float DESIRED_ROW = 1.2f;
         int row = (int)(_tilemap.Rows / DESIRED_ROW);
         int playerColumn = _tilemap.Columns / 2;
-        _playerPosition = new(
-            x: playerColumn * _tilemap.TileWidth,
-            y: row * _tilemap.TileHeight
+
+        Vector2 playerPosition = new(
+            playerColumn * _tilemap.TileWidth,
+            row * _tilemap.TileHeight
         );
-        _resetPlayerPosition = _playerPosition;
+        _player.Initialize(playerPosition);
 
         int croachColumn = (int)(_tilemap.Columns / DESIRED_ROW);
-        _croachPosition = new(
-            x: croachColumn * _tilemap.TileWidth,
-            y: row * _tilemap.TileHeight
+
+        Vector2 croachPosition = new(
+            croachColumn * _tilemap.TileWidth,
+            row * _tilemap.TileHeight
         );
+        _roach.Initialize(croachPosition);
     }
 
     protected override void LoadContent()
@@ -72,11 +66,15 @@ public class GameLoop : Core
         );
         const float SCALE = 2.0f;
 
-        _player = atlas.CreateAnimatedSprite(animationName: "player-animation");
-        _player.Scale = new Vector2(x: SCALE, y: SCALE);
+        AnimatedSprite playerAnimation = atlas.CreateAnimatedSprite(animationName: "player-animation");
+        playerAnimation.Scale = new Vector2(x: SCALE, y: SCALE);
 
-        _croach = atlas.CreateAnimatedSprite(animationName: "croach-animation");
-        _croach.Scale = new Vector2(x: SCALE, y: SCALE);
+        _player = new(playerAnimation);
+
+        AnimatedSprite roachAnimation = atlas.CreateAnimatedSprite(animationName: "roach-animation");
+        roachAnimation.Scale = new Vector2(x: SCALE, y: SCALE);
+
+        _roach = new(roachAnimation);
 
         _tilemap = Tilemap.FromFile(
             content: Content,
@@ -91,63 +89,30 @@ public class GameLoop : Core
     {
         // TODO: Add your update logic here
         _player.Update(gameTime);
-        _croach.Update(gameTime);
+        _roach.Update(gameTime);
 
-        CheckKeyboardInput();
-
-        Rectangle playerBounds = new(
-            x: (int)_playerPosition.X,
-            y: (int)_playerPosition.Y,
-            width: (int)_player.Width,
-            height: (int)_player.Height
-        );
-
-        Rectangle croachBounds = new(
-            x: (int)_croachPosition.X,
-            y: (int)_croachPosition.Y,
-            width: (int)_croach.Width,
-            height: (int)_croach.Height
-        );
-
-        if (playerBounds.Left < _roomBounds.Left)
-        {
-            _playerPosition.X = _roomBounds.Left;
-        }
-        else if (playerBounds.Right > _roomBounds.Right)
-        {
-            _playerPosition.X = _roomBounds.Right - _player.Width;
-        }
-
-        if (playerBounds.Intersects(croachBounds))
-        {
-            _playerPosition = _resetPlayerPosition;
-        }
+        CheckCollision();
 
         base.Update(gameTime);
     }
 
-    private void CheckKeyboardInput()
+    private void CheckCollision()
     {
-        // Stops the animation until an action occurs.
-        _player.StopAnimation();
+        Rectangle playerBounds = _player.GetBounds();
+        Rectangle roachBounds = _roach.GetBounds();
 
-        // If the space key is held down, the movement speed increases by 1.5f
-        float speed = MOVEMENT_SPEED;
-        if (Input.Keyboard.IsKeyDown(Keys.Space))
+        if (playerBounds.Left < _roomBounds.Left)
         {
-            speed *= 1.5f;
+            _player.Position.X = _roomBounds.Left;
+        }
+        else if (playerBounds.Right > _roomBounds.Right)
+        {
+            _player.Position.X = _roomBounds.Right - playerBounds.Width;
         }
 
-        if (GameController.MoveLeft())
+        if (playerBounds.Intersects(roachBounds))
         {
-            _player.PlayAnimation();
-            _playerPosition.X -= speed;
-        }
-
-        if (GameController.MoveRight())
-        {
-            _player.PlayAnimation();
-            _playerPosition.X += speed;
+            _player.Initialize(_player.ResetPlayerPosition);
         }
     }
 
@@ -161,15 +126,9 @@ public class GameLoop : Core
 
         _tilemap.Draw(SpriteBatch);
 
-        _player.Draw(
-            spriteBatch: SpriteBatch,
-            position: _playerPosition
-        );
+        _player.Draw();
 
-        _croach.Draw(
-            spriteBatch: SpriteBatch,
-            position: _croachPosition
-        );
+        _roach.Draw();
 
         SpriteBatch.End();
 

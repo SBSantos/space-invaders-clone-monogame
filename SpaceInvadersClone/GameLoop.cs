@@ -69,7 +69,10 @@ public class GameLoop : Core
         AnimatedSprite playerAnimation = atlas.CreateAnimatedSprite(animationName: "player-animation");
         playerAnimation.Scale = new Vector2(x: SCALE, y: SCALE);
 
-        _player = new(playerAnimation);
+        Sprite projectileSprite = atlas.CreateSprite(regionName: "projectile");
+        projectileSprite.Scale = new(x: SCALE, y: SCALE);
+
+        _player = new(playerAnimation, projectileSprite);
 
         AnimatedSprite roachAnimation = atlas.CreateAnimatedSprite(animationName: "roach-animation");
         roachAnimation.Scale = new Vector2(x: SCALE, y: SCALE);

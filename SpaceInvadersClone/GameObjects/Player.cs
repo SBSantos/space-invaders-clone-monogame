@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using GameLibrary;
 using GameLibrary.Graphics;
+using System.Collections.Generic;
 
 namespace SpaceInvadersClone.GameObjects;
 
@@ -8,6 +9,12 @@ public class Player
 {
     // The AnimatedSprite used to draw the player.
     private readonly AnimatedSprite _sprite;
+
+    // The projectile sprite.
+    private readonly Sprite _projectile;
+
+    // A list of Player's Projectile.
+    private readonly List<Projectile> _projectileList;
 
     // The player position.
     public Vector2 Position;
@@ -23,9 +30,11 @@ public class Player
     /// <param name="sprite">
     /// The AnimatedSprite to use when drawing the player.
     /// </param>
-    public Player(AnimatedSprite sprite)
+    public Player(AnimatedSprite sprite, Sprite projectileSprite)
     {
         _sprite = sprite;
+        _projectile = projectileSprite;
+        _projectileList = [];
     }
 
     /// <summary>
@@ -55,6 +64,10 @@ public class Player
             _sprite.PlayAnimation();
             Position.X += MOVEMENT_SPEED;
         }
+        if (GameController.Shoot())
+        {
+            CreateNewProjectile();
+        }
     }
 
     /// <summary>
@@ -70,6 +83,10 @@ public class Player
 
         // Handle any player input.
         HandleInput();
+
+        // Manage the projectile.
+        UpdateProjectile();
+        CheckProjectileCollision();
     }
 
     /// <summary>
@@ -78,6 +95,8 @@ public class Player
     public void Draw()
     {
         _sprite.Draw(Core.SpriteBatch, Position);
+
+        DrawProjectile();
     }
 
     /// <summary>
@@ -93,5 +112,70 @@ public class Player
             (int)_sprite.Width,
             (int)_sprite.Height
         );
+    }
+
+    private void AddProjectile(Projectile projectile)
+    {
+        _projectileList.Add(projectile);
+    }
+
+    private void RemoveProjectile(int index)
+    {
+        _projectileList.RemoveAt(index);
+    }
+
+    private void CreateNewProjectile()
+    {
+        Projectile newProjectile = new(_projectile);
+
+        // Place the Projectile in the middle of the player sprite.
+        const float HALF = 0.5f;
+
+        // Dividing in half isn't enought to place the projectile exactly
+        // in the middle, so the x-coordinate will be reduced by 1.
+        // It sucks to see the projectile just one pixel off, so this helps.
+        float middle = (_sprite.Width * HALF) - 1;
+
+        // The projectile is on the player sprite, so it's y-coordinate
+        // will be increased slightly.
+        float correctYPosition = newProjectile.Height;
+
+        newProjectile.Position.X = Position.X + middle;
+        newProjectile.Position.Y = Position.Y - correctYPosition;
+
+        AddProjectile(newProjectile);
+    }
+
+    private void UpdateProjectile()
+    {
+        for (int i = 0; i < _projectileList.Count; i++)
+        {
+            _projectileList[i].Update();
+        }
+    }
+
+    private void DrawProjectile()
+    {
+        for (int i = 0; i < _projectileList.Count; i++)
+        {
+            _projectileList[i].Draw();
+        }
+    }
+
+    private void CheckProjectileCollision()
+    {
+        Rectangle roomBounds = Core.GraphicsDevice
+                                   .PresentationParameters
+                                   .Bounds;
+
+        for (int i = 0; i < _projectileList.Count; i++)
+        {
+            Rectangle projectileBounds = _projectileList[i].GetBounds();
+            if (projectileBounds.Top <= roomBounds.Top)
+            {
+                RemoveProjectile(i);
+                i--;
+            }
+        }
     }
 }

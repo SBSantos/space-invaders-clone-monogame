@@ -49,5 +49,14 @@ public static class GameController
         return s_keyboard.IsKeyDown(Keys.Enter) ||
                s_gamePad.IsButtonDown(Buttons.A);
     }
+
+    /// <summary>
+    /// Returns true if the player has triggered the "shoot" action.
+    /// </summary>
+    public static bool Shoot()
+    {
+        return s_keyboard.WasKeyJustPressed(Keys.Space) ||
+               s_gamePad.WasButtonJustPressed(Buttons.X);
+    }
 }
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using GameLibrary;
 using GameLibrary.Graphics;
@@ -9,7 +10,7 @@ namespace SpaceInvadersClone;
 public class GameLoop : Core
 {
     private Player _player;
-    private Roach _roach;
+    private readonly List<Roach> _roachs = [];
 
     private Tilemap _tilemap;
 
@@ -47,13 +48,19 @@ public class GameLoop : Core
         );
         _player.Initialize(playerPosition);
 
-        int roachColumn = (int)(_tilemap.Columns / DESIRED_ROW);
+        int offset = 7;
+        int roachColumn = _tilemap.Columns;
+        int roachRow = _tilemap.Rows / 7;
+        for (int i = 0; i < _roachs.Count; i++)
+        {
+            Vector2 roachPosition = new(
+                (roachColumn - offset) * _tilemap.TileWidth,
+                roachRow * _tilemap.TileHeight
+            );
 
-        Vector2 roachPosition = new(
-            roachColumn * _tilemap.TileWidth,
-            row * _tilemap.TileHeight
-        );
-        _roach.Initialize(roachPosition);
+            _roachs[i].Initialize(roachPosition);
+            offset++;
+        }
     }
 
     protected override void LoadContent()
@@ -76,8 +83,13 @@ public class GameLoop : Core
 
         AnimatedSprite roachAnimation = atlas.CreateAnimatedSprite(animationName: "roach-animation");
         roachAnimation.Scale = new Vector2(x: SCALE, y: SCALE);
+        roachAnimation.StopAnimation();
 
-        _roach = new(roachAnimation);
+        for (int i = 0; i < 11; i++)
+        {
+            Roach newRoach = new(roachAnimation);
+            _roachs.Add(newRoach);
+        }
 
         _tilemap = Tilemap.FromFile(
             content: Content,
@@ -92,7 +104,11 @@ public class GameLoop : Core
     {
         // TODO: Add your update logic here
         _player.Update(gameTime);
-        _roach.Update(gameTime);
+
+        for (int i = 0; i < _roachs.Count; i++)
+        {
+            _roachs[i].Update(gameTime);
+        }
 
         CheckCollision();
 
@@ -102,7 +118,6 @@ public class GameLoop : Core
     private void CheckCollision()
     {
         Rectangle playerBounds = _player.GetBounds();
-        Rectangle roachBounds = _roach.GetBounds();
 
         if (playerBounds.Left < _roomBounds.Left)
         {
@@ -113,9 +128,28 @@ public class GameLoop : Core
             _player.Position.X = _roomBounds.Right - playerBounds.Width;
         }
 
-        if (playerBounds.Intersects(roachBounds))
+        for (int i = 0; i < _player.Projectiles.Count; i++)
         {
-            _player.Initialize(_player.ResetPlayerPosition);
+            Rectangle projectileBounds = _player.Projectiles[i]
+                                                .GetBounds();
+
+            for (int j = 0; j < _roachs.Count; j++)
+            {
+                Rectangle roachBounds = _roachs[j].GetBounds();
+                if (projectileBounds.Intersects(roachBounds))
+                {
+                    _player.RemoveProjectile(i);
+                    i--;
+
+                    _roachs.RemoveAt(j);
+                    j--;
+                }
+
+                if (playerBounds.Intersects(roachBounds))
+                {
+                    _player.Initialize(_player.ResetPlayerPosition);
+                }
+            }
         }
     }
 
@@ -131,7 +165,10 @@ public class GameLoop : Core
 
         _player.Draw();
 
-        _roach.Draw();
+        for (int i = 0; i < _roachs.Count; i++)
+        {
+            _roachs[i].Draw();
+        }
 
         SpriteBatch.End();
 

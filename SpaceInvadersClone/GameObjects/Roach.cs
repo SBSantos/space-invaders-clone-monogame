@@ -10,7 +10,7 @@ public class Roach
     private readonly AnimatedSprite _sprite;
 
     // The roach position
-    private Vector2 _position;
+    public Vector2 Position;
 
     /// <summary>
     /// Creates a new Roach.
@@ -29,7 +29,7 @@ public class Roach
     /// </summary>
     public void Initialize(Vector2 startPosition)
     {
-        _position = startPosition;
+        Position = startPosition;
     }
 
     /// <summary>
@@ -48,7 +48,7 @@ public class Roach
     /// </summary>
     public void Draw()
     {
-        _sprite.Draw(Core.SpriteBatch, _position);
+        _sprite.Draw(Core.SpriteBatch, Position);
     }
 
     /// <summary>
@@ -58,8 +58,8 @@ public class Roach
     public Rectangle GetBounds()
     {
         return new Rectangle(
-            (int)_position.X,
-            (int)_position.Y,
+            (int)Position.X,
+            (int)Position.Y,
             (int)_sprite.Width,
             (int)_sprite.Height
         );

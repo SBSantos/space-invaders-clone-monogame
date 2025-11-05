@@ -14,7 +14,7 @@ public class Player
     private readonly Sprite _projectile;
 
     // A list of Player's Projectile.
-    private readonly List<Projectile> _projectileList;
+    public List<Projectile> Projectiles;
 
     // The player position.
     public Vector2 Position;
@@ -34,7 +34,7 @@ public class Player
     {
         _sprite = sprite;
         _projectile = projectileSprite;
-        _projectileList = [];
+        Projectiles = [];
     }
 
     /// <summary>
@@ -114,14 +114,26 @@ public class Player
         );
     }
 
-    private void AddProjectile(Projectile projectile)
+    /// <summary>
+    /// Add a projectile to the list.
+    /// </summary>
+    /// <param name="projectile">
+    /// The projectile to add.
+    /// </param>
+    public void AddProjectile(Projectile projectile)
     {
-        _projectileList.Add(projectile);
+        Projectiles.Add(projectile);
     }
 
-    private void RemoveProjectile(int index)
+    /// <summary>
+    /// Removes a projectile in the list by a given index.
+    /// </summary>
+    /// <param name="index">
+    /// The index to remove the projectile.
+    /// </param>
+    public void RemoveProjectile(int index)
     {
-        _projectileList.RemoveAt(index);
+        Projectiles.RemoveAt(index);
     }
 
     private void CreateNewProjectile()
@@ -148,17 +160,17 @@ public class Player
 
     private void UpdateProjectile()
     {
-        for (int i = 0; i < _projectileList.Count; i++)
+        for (int i = 0; i < Projectiles.Count; i++)
         {
-            _projectileList[i].Update();
+            Projectiles[i].Update();
         }
     }
 
     private void DrawProjectile()
     {
-        for (int i = 0; i < _projectileList.Count; i++)
+        for (int i = 0; i < Projectiles.Count; i++)
         {
-            _projectileList[i].Draw();
+            Projectiles[i].Draw();
         }
     }
 
@@ -168,9 +180,9 @@ public class Player
                                    .PresentationParameters
                                    .Bounds;
 
-        for (int i = 0; i < _projectileList.Count; i++)
+        for (int i = 0; i < Projectiles.Count; i++)
         {
-            Rectangle projectileBounds = _projectileList[i].GetBounds();
+            Rectangle projectileBounds = Projectiles[i].GetBounds();
             if (projectileBounds.Top <= roomBounds.Top)
             {
                 RemoveProjectile(i);

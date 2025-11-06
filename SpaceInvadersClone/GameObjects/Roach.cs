@@ -1,6 +1,8 @@
+using System;
 using Microsoft.Xna.Framework;
 using GameLibrary;
 using GameLibrary.Graphics;
+
 
 namespace SpaceInvadersClone.GameObjects;
 
@@ -9,8 +11,20 @@ public class Roach
     // The AnimatedSprite
     private readonly AnimatedSprite _sprite;
 
+    // The time threshold for the next move
+    private readonly TimeSpan _threshold = TimeSpan.FromSeconds(1);
+
+    // Time until the threshold
+    private TimeSpan _time;
+
+    // Define the distance to the next tile.
+    private int _pace;
+
     // The roach position
     public Vector2 Position;
+
+    // Define if the enemy will move forward or backward
+    public bool IsMovingBackward;
 
     /// <summary>
     /// Creates a new Roach.
@@ -27,9 +41,10 @@ public class Roach
     /// Initializes the roach, can be used to reset it back
     /// to an initial state.
     /// </summary>
-    public void Initialize(Vector2 startPosition)
+    public void Initialize(Vector2 startPosition, Tilemap tilemap)
     {
         Position = startPosition;
+        _pace = (int)tilemap.TileWidth / 2;
     }
 
     /// <summary>
@@ -41,6 +56,7 @@ public class Roach
     public void Update(GameTime gameTime)
     {
         _sprite.Update(gameTime);
+        Movement(gameTime);
     }
 
     /// <summary>
@@ -63,5 +79,20 @@ public class Roach
             (int)_sprite.Width,
             (int)_sprite.Height
         );
+    }
+
+    private void Movement(GameTime gameTime)
+    {
+        _time += gameTime.ElapsedGameTime;
+
+        if (_time >= _threshold)
+        {
+            // Will move the enemies backward or forward
+            if (IsMovingBackward) { Position.X -= _pace; }
+            else { Position.X += _pace; }
+
+            // Always reset the time to zero
+            _time = TimeSpan.Zero;
+        }
     }
 }

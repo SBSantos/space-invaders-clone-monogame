@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using GameLibrary;
 using GameLibrary.Graphics;
 using SpaceInvadersClone.GameObjects;
+using System.Linq;
 
 namespace SpaceInvadersClone;
 
@@ -48,7 +49,7 @@ public class GameLoop : Core
         );
         _player.Initialize(playerPosition);
 
-        int offset = 7;
+        int offset = 6;
         int roachColumn = _tilemap.Columns;
         int roachRow = _tilemap.Rows / 7;
         for (int i = 0; i < _roachs.Count; i++)
@@ -58,7 +59,7 @@ public class GameLoop : Core
                 roachRow * _tilemap.TileHeight
             );
 
-            _roachs[i].Initialize(roachPosition);
+            _roachs[i].Initialize(roachPosition, _tilemap);
             offset++;
         }
     }
@@ -104,11 +105,13 @@ public class GameLoop : Core
     {
         // TODO: Add your update logic here
         _player.Update(gameTime);
+        CheckProjectileCollisionOnEnemies();
 
         for (int i = 0; i < _roachs.Count; i++)
         {
             _roachs[i].Update(gameTime);
         }
+        CheckEnemyOutOfAreaLimit();
 
         CheckCollision();
 
@@ -128,6 +131,18 @@ public class GameLoop : Core
             _player.Position.X = _roomBounds.Right - playerBounds.Width;
         }
 
+        for (int i = 0; i < _roachs.Count; i++)
+        {
+            Rectangle roachBounds = _roachs[i].GetBounds();
+            if (playerBounds.Intersects(roachBounds))
+            {
+                _player.Initialize(_player.ResetPlayerPosition);
+            }
+        }
+    }
+
+    private void CheckProjectileCollisionOnEnemies()
+    {
         for (int i = 0; i < _player.Projectiles.Count; i++)
         {
             Rectangle projectileBounds = _player.Projectiles[i]
@@ -136,6 +151,7 @@ public class GameLoop : Core
             for (int j = 0; j < _roachs.Count; j++)
             {
                 Rectangle roachBounds = _roachs[j].GetBounds();
+
                 if (projectileBounds.Intersects(roachBounds))
                 {
                     _player.RemoveProjectile(i);
@@ -144,11 +160,36 @@ public class GameLoop : Core
                     _roachs.RemoveAt(j);
                     j--;
                 }
+            }
+        }
+    }
 
-                if (playerBounds.Intersects(roachBounds))
-                {
-                    _player.Initialize(_player.ResetPlayerPosition);
-                }
+    private void CheckEnemyOutOfAreaLimit()
+    {
+        const int RIGHT_LIMIT = 4;
+        const int LEFT_LIMIT = 6;
+        const float NEXT_TILE = 0.5f;
+
+        float rightSideLimit = (_tilemap.Columns - RIGHT_LIMIT) * _tilemap.TileWidth;
+        float leftSideLimit = _tilemap.Columns / LEFT_LIMIT * _tilemap.TileWidth;
+
+        for (int i = 0; i < _roachs.Count; i++)
+        {
+            Rectangle first = _roachs[0].GetBounds();
+            if (first.X > rightSideLimit)
+            {
+                _roachs[i].Position.Y += NEXT_TILE;
+                _roachs[i].IsMovingBackward = true;
+            }
+
+            Rectangle last = _roachs.LastOrDefault()?
+                                    .GetBounds() ?? default;
+
+            float lastXPos = last.X - (last.Width / 2);
+            if (lastXPos < leftSideLimit)
+            {
+                _roachs[i].Position.Y += NEXT_TILE;
+                _roachs[i].IsMovingBackward = false;
             }
         }
     }

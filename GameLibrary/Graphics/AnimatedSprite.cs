@@ -67,6 +67,22 @@ public class AnimatedSprite : Sprite
     }
 
     /// <summary>
+    /// Updates the animated sprite every time this method it's called
+    /// without GameTime as a parameter.
+    /// </summary>
+    public void Update()
+    {
+        _currentFrame++;
+
+        if (_currentFrame >= _animation.Frames.Count)
+        {
+            _currentFrame = 0;
+        }
+
+        Region = _animation.Frames[_currentFrame];
+    }
+
+    /// <summary>
     /// Plays the animated sprite.
     /// </summary>
     public bool PlayAnimation()

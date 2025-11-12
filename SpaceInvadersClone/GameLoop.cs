@@ -4,14 +4,14 @@ using Microsoft.Xna.Framework.Graphics;
 using GameLibrary;
 using GameLibrary.Graphics;
 using SpaceInvadersClone.GameObjects;
-using System.Linq;
 
 namespace SpaceInvadersClone;
 
 public class GameLoop : Core
 {
     private Player _player;
-    private readonly List<Roach> _roachs = [];
+
+    private readonly List<Enemy> _enemies = [];
 
     private Tilemap _tilemap;
 
@@ -52,14 +52,17 @@ public class GameLoop : Core
         int offset = 6;
         int roachColumn = _tilemap.Columns;
         int roachRow = _tilemap.Rows / 7;
-        for (int i = 0; i < _roachs.Count; i++)
+        for (int i = 0; i < _enemies.Count; i++)
         {
             Vector2 roachPosition = new(
                 (roachColumn - offset) * _tilemap.TileWidth,
                 roachRow * _tilemap.TileHeight
             );
 
-            _roachs[i].Initialize(roachPosition, _tilemap);
+            _enemies[i].Initialize(
+                roachPosition,
+                _tilemap
+            );
             offset++;
         }
     }
@@ -82,14 +85,13 @@ public class GameLoop : Core
 
         _player = new(playerAnimation, projectileSprite);
 
-        AnimatedSprite roachAnimation = atlas.CreateAnimatedSprite(animationName: "roach-animation");
-        roachAnimation.Scale = new Vector2(x: SCALE, y: SCALE);
-        roachAnimation.StopAnimation();
-
         for (int i = 0; i < 11; i++)
         {
-            Roach newRoach = new(roachAnimation);
-            _roachs.Add(newRoach);
+            AnimatedSprite roachAnimation = atlas.CreateAnimatedSprite(animationName: "roach-animation");
+            roachAnimation.Scale = new(SCALE, SCALE);
+
+            Roach newEnemy = new(roachAnimation);
+            _enemies.Add(newEnemy);
         }
 
         _tilemap = Tilemap.FromFile(
@@ -105,93 +107,16 @@ public class GameLoop : Core
     {
         // TODO: Add your update logic here
         _player.Update(gameTime);
-        CheckProjectileCollisionOnEnemies();
+        _player.CheckCollision(_roomBounds, _enemies);
 
-        for (int i = 0; i < _roachs.Count; i++)
+        for (int i = 0; i < _enemies.Count; i++)
         {
-            _roachs[i].Update(gameTime);
+            _enemies[i].Update(gameTime);
+            _enemies[i].CheckEnemyOutOfAreaLimit(_enemies, i);
+            _enemies[i].CheckPlayerCollision(_player);
         }
-        CheckEnemyOutOfAreaLimit();
-
-        CheckCollision();
 
         base.Update(gameTime);
-    }
-
-    private void CheckCollision()
-    {
-        Rectangle playerBounds = _player.GetBounds();
-
-        if (playerBounds.Left < _roomBounds.Left)
-        {
-            _player.Position.X = _roomBounds.Left;
-        }
-        else if (playerBounds.Right > _roomBounds.Right)
-        {
-            _player.Position.X = _roomBounds.Right - playerBounds.Width;
-        }
-
-        for (int i = 0; i < _roachs.Count; i++)
-        {
-            Rectangle roachBounds = _roachs[i].GetBounds();
-            if (playerBounds.Intersects(roachBounds))
-            {
-                _player.Initialize(_player.ResetPlayerPosition);
-            }
-        }
-    }
-
-    private void CheckProjectileCollisionOnEnemies()
-    {
-        for (int i = 0; i < _player.Projectiles.Count; i++)
-        {
-            Rectangle projectileBounds = _player.Projectiles[i]
-                                                .GetBounds();
-
-            for (int j = 0; j < _roachs.Count; j++)
-            {
-                Rectangle roachBounds = _roachs[j].GetBounds();
-
-                if (projectileBounds.Intersects(roachBounds))
-                {
-                    _player.RemoveProjectile(i);
-                    i--;
-
-                    _roachs.RemoveAt(j);
-                    j--;
-                }
-            }
-        }
-    }
-
-    private void CheckEnemyOutOfAreaLimit()
-    {
-        const int RIGHT_LIMIT = 4;
-        const int LEFT_LIMIT = 6;
-        const float NEXT_TILE = 0.5f;
-
-        float rightSideLimit = (_tilemap.Columns - RIGHT_LIMIT) * _tilemap.TileWidth;
-        float leftSideLimit = _tilemap.Columns / LEFT_LIMIT * _tilemap.TileWidth;
-
-        for (int i = 0; i < _roachs.Count; i++)
-        {
-            Rectangle first = _roachs[0].GetBounds();
-            if (first.X > rightSideLimit)
-            {
-                _roachs[i].Position.Y += NEXT_TILE;
-                _roachs[i].IsMovingBackward = true;
-            }
-
-            Rectangle last = _roachs.LastOrDefault()?
-                                    .GetBounds() ?? default;
-
-            float lastXPos = last.X - (last.Width / 2);
-            if (lastXPos < leftSideLimit)
-            {
-                _roachs[i].Position.Y += NEXT_TILE;
-                _roachs[i].IsMovingBackward = false;
-            }
-        }
     }
 
     protected override void Draw(GameTime gameTime)
@@ -206,9 +131,9 @@ public class GameLoop : Core
 
         _player.Draw();
 
-        for (int i = 0; i < _roachs.Count; i++)
+        for (int i = 0; i < _enemies.Count; i++)
         {
-            _roachs[i].Draw();
+            _enemies[i].Draw();
         }
 
         SpriteBatch.End();

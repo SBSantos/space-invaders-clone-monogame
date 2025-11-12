@@ -84,9 +84,8 @@ public class Player
         // Handle any player input.
         HandleInput();
 
-        // Manage the projectile.
+        // Update the projectile.
         UpdateProjectile();
-        CheckProjectileCollision();
     }
 
     /// <summary>
@@ -174,12 +173,39 @@ public class Player
         }
     }
 
-    private void CheckProjectileCollision()
+    /// <summary>
+    /// Checks the player collision.
+    /// </summary>
+    /// <param name="roomBounds">
+    /// A rectangle representing the boundaries of the room
+    /// </param>
+    /// <param name="enemies">
+    /// An Enemy list.
+    /// </param>
+    public void CheckCollision(
+        Rectangle roomBounds,
+        List<Enemy> enemies
+    )
     {
-        Rectangle roomBounds = Core.GraphicsDevice
-                                   .PresentationParameters
-                                   .Bounds;
+        Rectangle playerBounds = GetBounds();
+        if (playerBounds.Left < roomBounds.Left)
+        {
+            Position.X = roomBounds.Left;
+        }
+        else if (playerBounds.Right > roomBounds.Right)
+        {
+            Position.X = roomBounds.Right - playerBounds.Width;
+        }
 
+        CheckProjectileCollision(enemies, roomBounds);
+    }
+
+    // Manages the collision of projectiles.
+    private void CheckProjectileCollision(
+        List<Enemy> enemies,
+        Rectangle roomBounds
+    )
+    {
         for (int i = 0; i < Projectiles.Count; i++)
         {
             Rectangle projectileBounds = Projectiles[i].GetBounds();
@@ -187,6 +213,16 @@ public class Player
             {
                 RemoveProjectile(i);
                 i--;
+            }
+
+            for (int j = 0; j < enemies.Count; j++)
+            {
+                Rectangle enemyBounds = enemies[j].GetBounds();
+                if (projectileBounds.Intersects(enemyBounds))
+                {
+                    RemoveProjectile(i);
+                    enemies.RemoveAt(j);
+                }
             }
         }
     }

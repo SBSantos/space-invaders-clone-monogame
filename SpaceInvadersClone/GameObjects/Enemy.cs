@@ -11,7 +11,7 @@ public class Enemy
     // The animated sprite.
     protected AnimatedSprite Sprite;
 
-    // The roach position
+    // The enemy position
     public Vector2 position;
 
     /// <summary>

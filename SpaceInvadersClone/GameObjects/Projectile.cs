@@ -25,7 +25,7 @@ public class Projectile
     /// </summary>
     public float Height => Sprite.Height;
 
-    public const float MOVEMENT_SPEED = 10.0f;
+    public const float MOVEMENT_SPEED = 15.0f;
 
     /// <summary>
     /// Create a new Projectile.

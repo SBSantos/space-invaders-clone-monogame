@@ -2,16 +2,14 @@
 <TextureAtlas>
     <Texture>images/atlas</Texture>
     <Regions>
-        <Region name="player-1" x="0" y="64" width="15" height="16" />
-        <Region name="player-2" x="16" y="64" width="15" height="16" />
-        <Region name="roach-1" x="3" y="1" width="11" height="14" />
-        <Region name="roach-2" x="19" y="1" width="11" height="14" />
-        <Region name="blob-1" x="1" y="17" width="14" height="14" />
-        <Region name="blob-2" x="17" y="18" width="14" height="13" />
-        <Region name="wavey-1" x="1" y="33" width="14" height="14" />
-        <Region name="wavey-2" x="17" y="34" width="14" height="13" />
-        <Region name="octocrimson-1" x="0" y="48" width="16" height="16" />
-        <Region name="octocrimson-2" x="16" y="49" width="16" height="15" />
+        <Region name="player-1" x="0" y="48" width="15" height="16" />
+        <Region name="player-2" x="16" y="48" width="15" height="16" />
+        <Region name="roach-1" x="3" y="0" width="11" height="14" />
+        <Region name="roach-2" x="19" y="0" width="11" height="14" />
+        <Region name="wavey-1" x="4" y="16" width="8" height="13" />
+        <Region name="wavey-2" x="20" y="16" width="8" height="13" />
+        <Region name="bigcrimson-1" x="1" y="32" width="14" height="16" />
+        <Region name="bigcrimson-2" x="17" y="32" width="14" height="16" />
         <Region name="projectile" x="35" y="64" width="1" height="4" />
     </Regions>
     <Animations>
@@ -22,6 +20,14 @@
         <Animation name="roach-animation" delay="1000">
             <Frame region="roach-1" />
             <Frame region="roach-2" />
+        </Animation>
+        <Animation name="wavey-animation" delay="1000">
+            <Frame region="wavey-1" />
+            <Frame region="wavey-2" />
+        </Animation>
+        <Animation name="bigcrimson-animation" delay="1000">
+            <Frame region="bigcrimson-1" />
+            <Frame region="bigcrimson-2" />
         </Animation>
     </Animations>
 </TextureAtlas>

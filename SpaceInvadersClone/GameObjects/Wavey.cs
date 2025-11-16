@@ -3,15 +3,15 @@ using GameLibrary.Graphics;
 
 namespace SpaceInvadersClone.GameObjects;
 
-public class Roach : Enemy
+public class Wavey : Enemy
 {
     /// <summary>
-    /// Create a new Roach using the specified sprite.
+    /// Create a new Wavey using the specified sprite.
     /// </summary>
     /// <param name="sprite">
-    /// The AnimatedSprite to use when drawing the roach.
+    /// The AnimatedSprite to use when drawing the wavey.
     /// </param>
-    public Roach(AnimatedSprite sprite, int layer) : base(sprite, layer)
+    public Wavey(AnimatedSprite sprite, int layer) : base(sprite, layer)
     {
         Sprite = sprite;
         Layer = layer;
@@ -25,7 +25,7 @@ public class Roach : Enemy
     {
         int enemyColumn = tilemap.Columns;
         int enemyRow = tilemap.Rows / 7;
-        float enemyOffset = MathF.Sqrt(tilemap.TileWidth / 4);
+        float enemyOffset = MathF.Sqrt(tilemap.TileWidth);
 
         position = new(
             ((enemyColumn - desiredColumn) * tilemap.TileWidth) + enemyOffset,

@@ -17,6 +17,10 @@ public class GameLoop : Core
 
     private Rectangle _roomBounds;
 
+    private int _enemyRow;
+
+    private const int ENEMY_COLUMN = 6;
+
     public GameLoop() : base(
         title: "SIC",
         width: 640,
@@ -39,8 +43,8 @@ public class GameLoop : Core
             screenBounds.Height - (int)_tilemap.TileHeight * 2
         );
 
-        const float DESIRED_ROW = 1.2f;
-        int row = (int)(_tilemap.Rows / DESIRED_ROW);
+        const float PLAYER_ROW = 1.2f;
+        int row = (int)(_tilemap.Rows / PLAYER_ROW);
         int playerColumn = _tilemap.Columns / 2;
 
         Vector2 playerPosition = new(
@@ -49,21 +53,59 @@ public class GameLoop : Core
         );
         _player.Initialize(playerPosition);
 
-        int offset = 6;
-        int roachColumn = _tilemap.Columns;
-        int roachRow = _tilemap.Rows / 7;
+        int _waveyColumn = ENEMY_COLUMN;
+        int _roachColumnL1 = ENEMY_COLUMN;
+        int _roachColumnL2 = ENEMY_COLUMN;
+        int _bigCrimsonColumnL1 = ENEMY_COLUMN;
+        int _bigCrimsonColumnL2 = ENEMY_COLUMN;
         for (int i = 0; i < _enemies.Count; i++)
         {
-            Vector2 roachPosition = new(
-                (roachColumn - offset) * _tilemap.TileWidth,
-                roachRow * _tilemap.TileHeight
-            );
+            if (_enemies[i] is Wavey)
+            {
+                _enemyRow = 0;
+                _enemies[i].Initialize(
+                    _enemyRow,
+                    _waveyColumn,
+                    _tilemap
+                );
+                _waveyColumn++;
+            }
 
-            _enemies[i].Initialize(
-                roachPosition,
-                _tilemap
-            );
-            offset++;
+            if (_enemies[i] is Roach)
+            {
+                if (_enemies[i].Layer == 2)
+                {
+                    _enemyRow = 2;
+                    _roachColumnL1 = _roachColumnL2;
+                    _roachColumnL2++;
+                }
+                else { _enemyRow = 1; }
+
+                _enemies[i].Initialize(
+                    _enemyRow,
+                    _roachColumnL1,
+                    _tilemap
+                );
+                _roachColumnL1++;
+            }
+
+            if (_enemies[i] is BigCrimson)
+            {
+                if (_enemies[i].Layer == 2)
+                {
+                    _enemyRow = 4;
+                    _bigCrimsonColumnL1 = _bigCrimsonColumnL2;
+                    _bigCrimsonColumnL2++;
+                }
+                else { _enemyRow = 3; }
+
+                _enemies[i].Initialize(
+                    _enemyRow,
+                    _bigCrimsonColumnL1,
+                    _tilemap
+                );
+                _bigCrimsonColumnL1++;
+            }
         }
     }
 
@@ -77,6 +119,12 @@ public class GameLoop : Core
         );
         const float SCALE = 2.0f;
 
+        _tilemap = Tilemap.FromFile(
+            content: Content,
+            filename: "images/tilemap-definition.xml"
+        );
+        _tilemap.Scale = new(x: SCALE, y: SCALE);
+
         AnimatedSprite playerAnimation = atlas.CreateAnimatedSprite(animationName: "player-animation");
         playerAnimation.Scale = new Vector2(x: SCALE, y: SCALE);
 
@@ -85,20 +133,68 @@ public class GameLoop : Core
 
         _player = new(playerAnimation, projectileSprite);
 
+        // Wavey
         for (int i = 0; i < 11; i++)
         {
-            AnimatedSprite roachAnimation = atlas.CreateAnimatedSprite(animationName: "roach-animation");
-            roachAnimation.Scale = new(SCALE, SCALE);
+            AnimatedSprite waveyAnimation = atlas.CreateAnimatedSprite(
+                "wavey-animation"
+            );
+            waveyAnimation.Scale = new(SCALE, SCALE);
 
-            Roach newEnemy = new(roachAnimation);
-            _enemies.Add(newEnemy);
+            const int LAYER = 1;
+            Wavey newWavey = new(waveyAnimation, LAYER);
+            _enemies.Add(newWavey);
         }
 
-        _tilemap = Tilemap.FromFile(
-            content: Content,
-            filename: "images/tilemap-definition.xml"
+        // Roach
+        AnimatedSprite roachAnimation = atlas.CreateAnimatedSprite(
+            "roach-animation"
         );
-        _tilemap.Scale = new(x: SCALE, y: SCALE);
+        roachAnimation.Scale = new(SCALE, SCALE);
+
+        for (int i = 0; i < 11; i++)
+        {
+            const int FIRST_LAYER = 1;
+
+            AnimatedSprite rLayer1 = roachAnimation.Clone();
+            rLayer1.Scale = new(SCALE, SCALE);
+
+            Roach enemyLayer1 = new(rLayer1, FIRST_LAYER);
+            _enemies.Add(enemyLayer1);
+
+            const int SECOND_LAYER = 2;
+
+            AnimatedSprite rLayer2 = roachAnimation.Clone();
+            rLayer2.Scale = new(SCALE, SCALE);
+
+            Roach enemyLayer2 = new(rLayer2, SECOND_LAYER);
+            _enemies.Add(enemyLayer2);
+        }
+
+        // Big Crimson
+        AnimatedSprite bigCrimsonAnimation = atlas.CreateAnimatedSprite(
+            "bigcrimson-animation"
+        );
+        bigCrimsonAnimation.Scale = new(SCALE, SCALE);
+
+        for (int i = 0; i < 11; i++)
+        {
+            const int FIRST_LAYER = 1;
+
+            AnimatedSprite bcL1 = bigCrimsonAnimation.Clone();
+            bcL1.Scale = new(SCALE, SCALE);
+
+            BigCrimson enemyLayer1 = new(bcL1, FIRST_LAYER);
+            _enemies.Add(enemyLayer1);
+
+            const int SECOND_LAYER = 2;
+
+            AnimatedSprite bcL2 = bigCrimsonAnimation.Clone();
+            bcL2.Scale = new(SCALE, SCALE);
+
+            BigCrimson enemyLayer2 = new(bcL2, SECOND_LAYER);
+            _enemies.Add(enemyLayer2);
+        }
 
         base.LoadContent();
     }

@@ -97,5 +97,13 @@ public class AnimatedSprite : Sprite
     {
         return _isAnimatonStopped = true;
     }
+
+    /// <summary>
+    /// Clones a AnimatedSprite.
+    /// </summary>
+    public AnimatedSprite Clone()
+    {
+        return new AnimatedSprite(Animation);
+    }
 }
 

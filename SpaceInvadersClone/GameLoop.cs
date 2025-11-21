@@ -46,7 +46,7 @@ public class GameLoop : Core
             screenBounds.Height - (int)_tilemap.TileHeight * 2
         );
 
-        const float PLAYER_ROW = 1.2f;
+        const float PLAYER_ROW = 1.1f;
         int row = (int)(_tilemap.Rows / PLAYER_ROW);
         int playerColumn = _tilemap.Columns / 2;
 
@@ -132,9 +132,10 @@ public class GameLoop : Core
         laserSprite.Scale = new(SCALE, SCALE);
 
         // row
+        const int ROW_OFFSET = 2;
         for (int i = 0; i < 5; i++)
         {
-            int row = i + 1;
+            int row = i + ROW_OFFSET;
             // column
             for (int j = 0; j < 11; j++)
             {

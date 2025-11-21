@@ -1,4 +1,5 @@
 using System;
+using Microsoft.Xna.Framework;
 using GameLibrary.Graphics;
 
 namespace SpaceInvadersClone.GameObjects;
@@ -11,28 +12,33 @@ public class Wavey : Enemy
     /// <param name="sprite">
     /// The AnimatedSprite to use when drawing the wavey.
     /// </param>
-    public Wavey(AnimatedSprite sprite, int layer) : base(sprite, layer)
+    public Wavey(
+        AnimatedSprite sprite,
+        Sprite laserSprite,
+        Tilemap tilemap,
+        int row
+    ) : base(
+        sprite,
+        laserSprite,
+        tilemap,
+        row
+    )
     {
         Sprite = sprite;
-        Layer = layer;
+        LaserSprite = laserSprite;
+        Row = row;
     }
 
     public override void Initialize(
-        int desiredRow,
-        int desiredColumn,
-        Tilemap tilemap
+        float x,
+        float y
     )
     {
-        int enemyColumn = tilemap.Columns;
-        int enemyRow = tilemap.Rows / 7;
-        float enemyOffset = MathF.Sqrt(tilemap.TileWidth);
+        float enemyOffset = (Sprite.Width / 2) - 1;
 
-        position = new(
-            ((enemyColumn - desiredColumn) * tilemap.TileWidth) + enemyOffset,
-            (enemyRow + desiredRow) * tilemap.TileHeight
+        Position = new(
+            x + enemyOffset,
+            y
         );
-
-        Tilemap = tilemap;
-        Pace = (int)tilemap.TileWidth / 2;
     }
 }

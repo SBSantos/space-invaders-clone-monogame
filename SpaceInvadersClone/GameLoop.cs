@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using GameLibrary;
@@ -17,9 +18,11 @@ public class GameLoop : Core
 
     private Rectangle _roomBounds;
 
-    private int _enemyRow;
+    private readonly Random _random = new();
 
-    private const int ENEMY_COLUMN = 6;
+    private TimeSpan ShootTime;
+
+    private TimeSpan ShootThreshold;
 
     public GameLoop() : base(
         title: "SIC",
@@ -53,58 +56,43 @@ public class GameLoop : Core
         );
         _player.Initialize(playerPosition);
 
-        int _waveyColumn = ENEMY_COLUMN;
-        int _roachColumnL1 = ENEMY_COLUMN;
-        int _roachColumnL2 = ENEMY_COLUMN;
-        int _bigCrimsonColumnL1 = ENEMY_COLUMN;
-        int _bigCrimsonColumnL2 = ENEMY_COLUMN;
+        // The tile offset
+        const int OFFSET = 2;
+
+        // The quantity of enemies
+        const int LIMIT = 11 + OFFSET;
+
+        // The x-coordinate where the enemies should start
+        int x = OFFSET;
+
         for (int i = 0; i < _enemies.Count; i++)
         {
+            // Set the threshold value for the enemy to shoot
+            int thresholdValue = _enemies[0].ShootThreshold;
+            ShootThreshold = TimeSpan.FromMilliseconds(thresholdValue);
+
+            x++;
+
+            float xPos = x * _tilemap.TileWidth;
+
+            // The y-coordinate of the enemies.
+            // The Layer value defines their y position on the tilemap
+            float yPos = _enemies[i].Row * _tilemap.TileHeight;
+
+            // reset the x value to it's original value
+            if (x >= LIMIT) { x = OFFSET; }
+
             if (_enemies[i] is Wavey)
             {
-                _enemyRow = 0;
-                _enemies[i].Initialize(
-                    _enemyRow,
-                    _waveyColumn,
-                    _tilemap
-                );
-                _waveyColumn++;
+                _enemies[i].Initialize(xPos, yPos);
             }
-
             if (_enemies[i] is Roach)
             {
-                if (_enemies[i].Layer == 2)
-                {
-                    _enemyRow = 2;
-                    _roachColumnL1 = _roachColumnL2;
-                    _roachColumnL2++;
-                }
-                else { _enemyRow = 1; }
-
-                _enemies[i].Initialize(
-                    _enemyRow,
-                    _roachColumnL1,
-                    _tilemap
-                );
-                _roachColumnL1++;
+                _enemies[i].Initialize(xPos, yPos);
             }
-
             if (_enemies[i] is BigCrimson)
             {
-                if (_enemies[i].Layer == 2)
-                {
-                    _enemyRow = 4;
-                    _bigCrimsonColumnL1 = _bigCrimsonColumnL2;
-                    _bigCrimsonColumnL2++;
-                }
-                else { _enemyRow = 3; }
-
-                _enemies[i].Initialize(
-                    _enemyRow,
-                    _bigCrimsonColumnL1,
-                    _tilemap
-                );
-                _bigCrimsonColumnL1++;
+                _enemies[i].Initialize(xPos, yPos);
             }
         }
     }
@@ -125,75 +113,75 @@ public class GameLoop : Core
         );
         _tilemap.Scale = new(x: SCALE, y: SCALE);
 
-        AnimatedSprite playerAnimation = atlas.CreateAnimatedSprite(animationName: "player-animation");
+        AnimatedSprite playerAnimation = atlas.CreateAnimatedSprite(
+            "player-animation"
+        );
         playerAnimation.Scale = new Vector2(x: SCALE, y: SCALE);
 
-        Sprite projectileSprite = atlas.CreateSprite(regionName: "projectile");
-        projectileSprite.Scale = new(x: SCALE, y: SCALE);
-
-        _player = new(playerAnimation, projectileSprite);
-
-        // Wavey
-        for (int i = 0; i < 11; i++)
-        {
-            AnimatedSprite waveyAnimation = atlas.CreateAnimatedSprite(
-                "wavey-animation"
-            );
-            waveyAnimation.Scale = new(SCALE, SCALE);
-
-            const int LAYER = 1;
-            Wavey newWavey = new(waveyAnimation, LAYER);
-            _enemies.Add(newWavey);
-        }
-
-        // Roach
-        AnimatedSprite roachAnimation = atlas.CreateAnimatedSprite(
-            "roach-animation"
+        Sprite bulletSprite = atlas.CreateSprite(
+            "bullet"
         );
-        roachAnimation.Scale = new(SCALE, SCALE);
+        bulletSprite.Scale = new(x: SCALE, y: SCALE);
 
-        for (int i = 0; i < 11; i++)
-        {
-            const int FIRST_LAYER = 1;
+        _player = new(playerAnimation, bulletSprite);
 
-            AnimatedSprite rLayer1 = roachAnimation.Clone();
-            rLayer1.Scale = new(SCALE, SCALE);
-
-            Roach enemyLayer1 = new(rLayer1, FIRST_LAYER);
-            _enemies.Add(enemyLayer1);
-
-            const int SECOND_LAYER = 2;
-
-            AnimatedSprite rLayer2 = roachAnimation.Clone();
-            rLayer2.Scale = new(SCALE, SCALE);
-
-            Roach enemyLayer2 = new(rLayer2, SECOND_LAYER);
-            _enemies.Add(enemyLayer2);
-        }
-
-        // Big Crimson
-        AnimatedSprite bigCrimsonAnimation = atlas.CreateAnimatedSprite(
-            "bigcrimson-animation"
+        // Enemy's laser
+        Sprite laserSprite = atlas.CreateSprite(
+            "laser"
         );
-        bigCrimsonAnimation.Scale = new(SCALE, SCALE);
+        laserSprite.Scale = new(SCALE, SCALE);
 
-        for (int i = 0; i < 11; i++)
+        // row
+        for (int i = 0; i < 5; i++)
         {
-            const int FIRST_LAYER = 1;
+            int row = i + 1;
+            // column
+            for (int j = 0; j < 11; j++)
+            {
+                AnimatedSprite sprite;
 
-            AnimatedSprite bcL1 = bigCrimsonAnimation.Clone();
-            bcL1.Scale = new(SCALE, SCALE);
+                if (i == 0)
+                {
+                    sprite = atlas.CreateAnimatedSprite("wavey-animation");
+                    sprite.Scale = new(SCALE, SCALE);
 
-            BigCrimson enemyLayer1 = new(bcL1, FIRST_LAYER);
-            _enemies.Add(enemyLayer1);
+                    Wavey wavey = new(
+                        sprite,
+                        laserSprite,
+                        _tilemap,
+                        row
+                    );
+                    _enemies.Add(wavey);
+                }
 
-            const int SECOND_LAYER = 2;
+                if (i > 0 && i <= 2)
+                {
+                    sprite = atlas.CreateAnimatedSprite("roach-animation");
+                    sprite.Scale = new(SCALE, SCALE);
 
-            AnimatedSprite bcL2 = bigCrimsonAnimation.Clone();
-            bcL2.Scale = new(SCALE, SCALE);
+                    Roach roach = new(
+                        sprite,
+                        laserSprite,
+                        _tilemap,
+                        row
+                    );
+                    _enemies.Add(roach);
+                }
 
-            BigCrimson enemyLayer2 = new(bcL2, SECOND_LAYER);
-            _enemies.Add(enemyLayer2);
+                if (i > 2 && i < 5)
+                {
+                    sprite = atlas.CreateAnimatedSprite("bigcrimson-animation");
+                    sprite.Scale = new(SCALE, SCALE);
+
+                    BigCrimson bigCrimson = new(
+                        sprite,
+                        laserSprite,
+                        _tilemap,
+                        row
+                    );
+                    _enemies.Add(bigCrimson);
+                }
+            }
         }
 
         base.LoadContent();
@@ -205,11 +193,19 @@ public class GameLoop : Core
         _player.Update(gameTime);
         _player.CheckCollision(_roomBounds, _enemies);
 
+        ShootTime += gameTime.ElapsedGameTime;
         for (int i = 0; i < _enemies.Count; i++)
         {
-            _enemies[i].Update(gameTime);
-            _enemies[i].CheckEnemyOutOfAreaLimit(_enemies, i);
-            _enemies[i].CheckPlayerCollision(_player);
+            _enemies[i].Update(gameTime, _enemies);
+            _enemies[i].ChangeDirection(_enemies, _roomBounds);
+            _enemies[i].CheckCollision(_player, _roomBounds);
+
+            if (ShootTime >= ShootThreshold)
+            {
+                int index = _random.Next(_enemies.Count);
+                _enemies[index].ShootLaser();
+                ShootTime -= ShootThreshold;
+            }
         }
 
         base.Update(gameTime);

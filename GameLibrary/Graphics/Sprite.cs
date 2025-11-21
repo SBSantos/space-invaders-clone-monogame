@@ -117,5 +117,13 @@ public class Sprite
             LayerDepth
         );
     }
+
+    /// <summary>
+    /// Clones a new instance of this sprite.
+    /// </summary>
+    public virtual Sprite Clone()
+    {
+        return new Sprite(Region);
+    }
 }
 

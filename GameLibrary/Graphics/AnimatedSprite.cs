@@ -101,7 +101,7 @@ public class AnimatedSprite : Sprite
     /// <summary>
     /// Clones a AnimatedSprite.
     /// </summary>
-    public AnimatedSprite Clone()
+    public override AnimatedSprite Clone()
     {
         return new AnimatedSprite(Animation);
     }

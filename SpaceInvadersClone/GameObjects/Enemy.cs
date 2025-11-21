@@ -9,17 +9,22 @@ namespace SpaceInvadersClone.GameObjects;
 
 public class Enemy
 {
+    #region Fields
     // The animated sprite.
     protected AnimatedSprite Sprite;
 
-    // The enemy position
-    public Vector2 position;
+    // The Laser sprite.
+    protected Sprite LaserSprite;
 
+    // The enemy position
+    public Vector2 Position;
+    #endregion
+
+    #region Properties
     /// <summary>
-    /// Gets or Set the layer of multiples enemies,
-    /// for new row of enemies.
+    /// Gets or Set the row of multiples enemies,
     /// </summary>
-    public int Layer { get; set; }
+    public int Row { get; set; }
 
     /// <summary>
     /// Time until it hit the threshold.
@@ -30,6 +35,12 @@ public class Enemy
     /// The threshold for the next move.
     /// </summary>
     public TimeSpan Threshold { get; set; }
+
+    /// <summary>
+    /// The time threshold value, in milliseconds,
+    /// for the enemy to shoot
+    /// </summary>
+    public int ShootThreshold { get; set; }
 
     /// <summary>
     /// The tilemap for this enemy.
@@ -44,7 +55,7 @@ public class Enemy
     /// <summary>
     /// The value for the enemy to jump for the next row.
     /// </summary>
-    public Vector2 NextRow { get; set; } = Vector2.UnitY / 2;
+    public float NextRow { get; set; }
 
     /// <summary>
     /// Defines if the enemy is moving forward or backward.
@@ -52,38 +63,56 @@ public class Enemy
     public bool IsMovingBackward { get; set; }
 
     /// <summary>
+    /// Defines if the is moving down to the next row.
+    /// </summary>
+    public bool IsMovingDown { get; set; }
+
+    /// <summary>
+    /// The list of enemy's laser.
+    /// </summary>
+    public List<Laser> Lasers { get; set; }
+    #endregion
+
+    /// <summary>
     /// Creates a new Enemy using a specified sprite.
     /// </summary>
     /// <param name="sprite">
     /// The AnimatedSprite to use when drawing the enemy.
     /// </param>
-    public Enemy(AnimatedSprite sprite, int layer)
+    /// <param name="laserSprite">
+    /// The Sprite of the enemy laser.
+    /// <param>
+    /// <param name="tilemap">
+    /// The tilemap.
+    /// <param name="row">
+    /// The value of the row where the enemy should be.
+    /// </param>
+    public Enemy(
+        AnimatedSprite sprite,
+        Sprite laserSprite,
+        Tilemap tilemap,
+        int row
+    )
     {
         Sprite = sprite;
-        Layer = layer;
+        LaserSprite= laserSprite;
+        Lasers = [];
+        Tilemap = tilemap;
+        Pace = (int)tilemap.TileWidth / 2;
+        Row = row;
+        NextRow = 0.5f; // half a tile
         Threshold = sprite.Animation.Delay;
+        ShootThreshold = 1300;
     }
 
+    #region Methods
     /// <summary>
     /// Initializes the enemy, can be used to reset it back
     /// to an initial state.
     /// </summary>
-    public virtual void Initialize(
-        int desiredRow,
-        int desiredColumn,
-        Tilemap tilemap
-    )
+    public virtual void Initialize(float x, float y)
     {
-        int enemyColumn = tilemap.Columns;
-        int enemyRow = tilemap.Rows / 7;
-
-        position = new(
-            (enemyColumn - desiredColumn) * tilemap.TileWidth,
-            (enemyRow + desiredRow) * tilemap.TileHeight
-        );
-
-        Tilemap = tilemap;
-        Pace = (int)tilemap.TileWidth / 2;
+        Position = new(x, y);
     }
 
     /// <summary>
@@ -92,7 +121,10 @@ public class Enemy
     /// <param name="gameTime">
     /// A snapshot of the timing values for current update cycle.
     /// </param>
-    public virtual void Update(GameTime gameTime)
+    public virtual void Update(
+        GameTime gameTime,
+        List<Enemy> enemies
+    )
     {
         Time += gameTime.ElapsedGameTime;
 
@@ -102,12 +134,13 @@ public class Enemy
             Sprite.Update();
 
             // Will move the enemies backward or forward
-            if (IsMovingBackward) { position.X -= Pace; }
-            else { position.X += Pace; }
+            Movement();
 
             // Always reset the time to zero
             Time -= Threshold;
         }
+
+        UpdateLaser();
     }
 
     /// <summary>
@@ -115,7 +148,9 @@ public class Enemy
     /// </summary>
     public virtual void Draw()
     {
-        Sprite.Draw(Core.SpriteBatch, position);
+        Sprite.Draw(Core.SpriteBatch, Position);
+
+        DrawLaser();
     }
 
     /// <summary>
@@ -125,56 +160,74 @@ public class Enemy
     public virtual Rectangle GetBounds()
     {
         return new Rectangle(
-            (int)position.X,
-            (int)position.Y,
+            (int)Position.X,
+            (int)Position.Y,
             (int)Sprite.Width,
             (int)Sprite.Height
         );
     }
 
+    // Return a Rectangle value with the enemy position
+    // and the width and height of a tile
+    private Rectangle GetTileBounds()
+    {
+        return new Rectangle(
+            (int)Position.X,
+            (int)Position.Y,
+            (int)Tilemap.TileWidth,
+            (int)Tilemap.TileHeight
+        );
+    }
+
+    // Moves the enemies left or right
+    private void Movement()
+    {
+        if (!IsMovingBackward) { Position.X += Pace; }
+        else { Position.X -= Pace; }
+    }
+
     /// <summary>
-    /// Check if a enemy is out of it's area limit.
+    /// Manages the direction change of the enemies when
+    /// they reaches a limit of area
     /// </summary>
     /// <param name="enemies">
-    /// An Enemy list.
+    /// A enemy list
     /// </param>
-    /// <param name="index">
-    /// The Enemy index.
+    /// <param name="roomBounds">
+    /// A rectangle representing the boundaries of the room.
     /// </param>
-    public virtual void CheckEnemyOutOfAreaLimit(
+    public virtual void ChangeDirection(
         List<Enemy> enemies,
-        int index
+        Rectangle roomBounds
     )
     {
-        const int RIGHT_LIMIT = 4;
-        const int LEFT_LIMIT = 6;
-
-        float rightSideLimit = (Tilemap.Columns - RIGHT_LIMIT)
-                               * Tilemap.TileWidth;
-
-        float leftSideLimit = Tilemap.Columns / LEFT_LIMIT
-                              * Tilemap.TileWidth;
-
-        var firstLine = enemies.Where(x => x is Wavey)
-                               .ToList();
-
-        Rectangle firstBound = firstLine.FirstOrDefault()?
-                                        .GetBounds()?? default;
-
-        Rectangle lastBound = firstLine.LastOrDefault()?
-                                       .GetBounds() ?? default;
-
-        if (firstBound.X > rightSideLimit)
+        for (int i = 0; i < enemies.Count; i++)
         {
-            enemies[index].position += NextRow;
-            enemies[index].IsMovingBackward = true;
+            Rectangle enemyBounds = enemies[i].GetTileBounds();
+
+            if (enemyBounds.Right > roomBounds.Right)
+            {
+                IsMovingBackward = true;
+                IsMovingDown = true;
+            }
+
+            float leftSidePos = enemyBounds.X - (enemyBounds.Width / 2);
+            if (leftSidePos < roomBounds.Left)
+            {
+                IsMovingBackward = false;
+                IsMovingDown = true;
+            }
         }
 
-        float lastXPos = lastBound.X - (lastBound.Width / 2);
-        if (lastXPos < leftSideLimit)
+        MoveDown(IsMovingDown);
+    }
+
+    private void MoveDown(bool movingDown)
+    {
+        if (movingDown)
         {
-            enemies[index].position += NextRow;
-            enemies[index].IsMovingBackward = false;
+            Position.Y += NextRow;
+            IsMovingDown = false;
         }
     }
 
@@ -184,11 +237,75 @@ public class Enemy
     /// <param name="player">
     /// The player to check collision.
     /// </param>
-    public virtual void CheckPlayerCollision(Player player)
+    /// <param name="roomBounds">
+    /// A rectangle representing the boundaries of the room.
+    /// </param>
+    public virtual void CheckCollision(
+        Player player,
+        Rectangle roomBounds)
     {
-        if (GetBounds().Intersects(player.GetBounds()))
+        Rectangle playerBounds = player.GetBounds();
+        for (int i = 0; i < Lasers.Count; i++)
         {
-            player.Initialize(player.ResetPlayerPosition);
+            Rectangle laserBounds = Lasers[i].GetBounds();
+            if (laserBounds.Bottom >= roomBounds.Bottom)
+            {
+                RemoveLaser(i);
+                i--;
+            }
+
+            if (laserBounds.Intersects(playerBounds))
+            {
+                RemoveLaser(i);
+                // player.Initialize(player.ResetPlayerPosition);
+                i--;
+            }
         }
     }
+
+    private void AddLaser(Laser laser)
+    {
+        Lasers.Add(laser);
+    }
+
+    private void RemoveLaser(int index)
+    {
+        Lasers.RemoveAt(index);
+    }
+
+    /// <summary>
+    /// Create a shoot a new Laser sprite.
+    /// </summary>
+    public void ShootLaser()
+    {
+        Laser newLaser = new(LaserSprite);
+
+        const float HALF = 0.5f;
+
+        float middle = (LaserSprite.Width * HALF) - 1;
+
+        float correctYPosition = newLaser.Height;
+
+        newLaser.Position.X = Position.X + middle;
+        newLaser.Position.Y = Position.Y - correctYPosition;
+
+        AddLaser(newLaser);
+    }
+
+    private void UpdateLaser()
+    {
+        for (int i = 0; i < Lasers.Count; i++)
+        {
+            Lasers[i].Update();
+        }
+    }
+
+    private void DrawLaser()
+    {
+        for (int i = 0; i < Lasers.Count; i++)
+        {
+            Lasers[i].Draw();
+        }
+    }
+    #endregion
 }

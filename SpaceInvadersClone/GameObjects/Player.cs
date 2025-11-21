@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using GameLibrary;
 using GameLibrary.Graphics;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SpaceInvadersClone.GameObjects;
 
@@ -10,11 +11,11 @@ public class Player
     // The AnimatedSprite used to draw the player.
     private readonly AnimatedSprite _sprite;
 
-    // The projectile sprite.
-    private readonly Sprite _projectile;
+    // The bullet sprite.
+    private readonly Sprite _bullet;
 
-    // A list of Player's Projectile.
-    public List<Projectile> Projectiles;
+    // A list of Player's bullet.
+    public List<Bullet> Bullets;
 
     // The player position.
     public Vector2 Position;
@@ -30,11 +31,14 @@ public class Player
     /// <param name="sprite">
     /// The AnimatedSprite to use when drawing the player.
     /// </param>
-    public Player(AnimatedSprite sprite, Sprite projectileSprite)
+    /// <param name="bulletSprite">
+    /// The Sprite to use when drawing the bullet.
+    /// </param>
+    public Player(AnimatedSprite sprite, Sprite bulletSprite)
     {
         _sprite = sprite;
-        _projectile = projectileSprite;
-        Projectiles = [];
+        _bullet = bulletSprite;
+        Bullets = [];
     }
 
     /// <summary>
@@ -66,7 +70,7 @@ public class Player
         }
         if (GameController.Shoot())
         {
-            CreateNewProjectile();
+            CreateNewBullet();
         }
     }
 
@@ -84,8 +88,8 @@ public class Player
         // Handle any player input.
         HandleInput();
 
-        // Update the projectile.
-        UpdateProjectile();
+        // Update the bullet.
+        UpdateBullet();
     }
 
     /// <summary>
@@ -95,7 +99,7 @@ public class Player
     {
         _sprite.Draw(Core.SpriteBatch, Position);
 
-        DrawProjectile();
+        DrawBullet();
     }
 
     /// <summary>
@@ -114,62 +118,62 @@ public class Player
     }
 
     /// <summary>
-    /// Add a projectile to the list.
+    /// Add a bullet to the list.
     /// </summary>
-    /// <param name="projectile">
-    /// The projectile to add.
+    /// <param name="bullet">
+    /// The bullet to add.
     /// </param>
-    public void AddProjectile(Projectile projectile)
+    public void AddBullet(Bullet bullet)
     {
-        Projectiles.Add(projectile);
+        Bullets.Add(bullet);
     }
 
     /// <summary>
-    /// Removes a projectile in the list by a given index.
+    /// Removes a bullet in the list by a given index.
     /// </summary>
     /// <param name="index">
-    /// The index to remove the projectile.
+    /// The index to remove the bullet.
     /// </param>
-    public void RemoveProjectile(int index)
+    public void RemoveBullet(int index)
     {
-        Projectiles.RemoveAt(index);
+        Bullets.RemoveAt(index);
     }
 
-    private void CreateNewProjectile()
+    private void CreateNewBullet()
     {
-        Projectile newProjectile = new(_projectile);
+        Bullet newBullet = new(_bullet);
 
-        // Place the Projectile in the middle of the player sprite.
+        // Place the bullet in the middle of the player sprite.
         const float HALF = 0.5f;
 
-        // Dividing in half isn't enought to place the projectile exactly
+        // Dividing in half isn't enought to place the bullet exactly
         // in the middle, so the x-coordinate will be reduced by 1.
-        // It sucks to see the projectile just one pixel off, so this helps.
+        // It sucks to see the bullet just one pixel off, so this helps.
         float middle = (_sprite.Width * HALF) - 1;
 
-        // The projectile is on the player sprite, so it's y-coordinate
+        // The bullet is on the player sprite, so it's y-coordinate
         // will be increased slightly.
-        float correctYPosition = newProjectile.Height;
+        float correctYPosition = newBullet.Height;
 
-        newProjectile.Position.X = Position.X + middle;
-        newProjectile.Position.Y = Position.Y - correctYPosition;
+        newBullet.Position.X = Position.X + middle;
+        newBullet.Position.Y = Position.Y - correctYPosition;
 
-        AddProjectile(newProjectile);
+        AddBullet(newBullet);
     }
 
-    private void UpdateProjectile()
+    private void UpdateBullet()
     {
-        for (int i = 0; i < Projectiles.Count; i++)
+        for (int i = 0; i < Bullets.Count; i++)
         {
-            Projectiles[i].Update();
+            Bullets[i].Update();
         }
     }
 
-    private void DrawProjectile()
+    private void DrawBullet()
     {
-        for (int i = 0; i < Projectiles.Count; i++)
+        for (int i = 0; i < Bullets.Count; i++)
         {
-            Projectiles[i].Draw();
+            Bullets[i].Draw();
         }
     }
 
@@ -197,31 +201,32 @@ public class Player
             Position.X = roomBounds.Right - playerBounds.Width;
         }
 
-        CheckProjectileCollision(enemies, roomBounds);
+        CheckBulletCollision(enemies, roomBounds);
     }
 
-    // Manages the collision of projectiles.
-    private void CheckProjectileCollision(
+    // Manages the collision of bullets.
+    public void CheckBulletCollision(
         List<Enemy> enemies,
         Rectangle roomBounds
     )
     {
-        for (int i = 0; i < Projectiles.Count; i++)
+        for (int i = 0; i < Bullets.Count; i++)
         {
-            Rectangle projectileBounds = Projectiles[i].GetBounds();
-            if (projectileBounds.Top <= roomBounds.Top)
+            Rectangle bulletBounds = Bullets[i].GetBounds();
+            if (bulletBounds.Top <= roomBounds.Top)
             {
-                RemoveProjectile(i);
+                RemoveBullet(i);
                 i--;
             }
 
             for (int j = 0; j < enemies.Count; j++)
             {
                 Rectangle enemyBounds = enemies[j].GetBounds();
-                if (projectileBounds.Intersects(enemyBounds))
+                if (bulletBounds.Intersects(enemyBounds))
                 {
-                    RemoveProjectile(i);
+                    RemoveBullet(i);
                     enemies.RemoveAt(j);
+                    i--;
                 }
             }
         }

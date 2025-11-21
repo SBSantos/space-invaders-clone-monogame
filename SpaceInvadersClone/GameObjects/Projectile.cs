@@ -4,6 +4,12 @@ using Microsoft.Xna.Framework;
 
 namespace SpaceInvadersClone.GameObjects;
 
+public enum Owner
+{
+    Player,
+    Enemy
+}
+
 public class Projectile
 {
     // The TextureRegion of this projectile.
@@ -25,7 +31,12 @@ public class Projectile
     /// </summary>
     public float Height => Sprite.Height;
 
-    public const float MOVEMENT_SPEED = 15.0f;
+    /// <summary>
+    /// The Owner of this projectile.
+    /// </summary>
+    public Owner Owner { get; set; }
+
+    public const float MOVEMENT_SPEED = 10.0f;
 
     /// <summary>
     /// Create a new Projectile.
@@ -41,7 +52,7 @@ public class Projectile
     /// <summary>
     /// Get the bounds of this Projectile.
     /// </summary>
-    public Rectangle GetBounds()
+    public virtual Rectangle GetBounds()
     {
         return new Rectangle(
             (int)Position.X,
@@ -54,15 +65,12 @@ public class Projectile
     /// <summary>
     /// Update the Projectile.
     /// </summary>
-    public void Update()
-    {
-        Position.Y -= MOVEMENT_SPEED;
-    }
+    public virtual void Update() {}
 
     /// <summary>
     /// Draw the Projectile.
     /// </summary>
-    public void Draw()
+    public virtual void Draw()
     {
         Sprite.Draw(Core.SpriteBatch, Position);
     }

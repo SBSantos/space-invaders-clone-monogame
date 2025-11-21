@@ -36,7 +36,7 @@ public class Projectile
     /// </summary>
     public Owner Owner { get; set; }
 
-    public const float MOVEMENT_SPEED = 10.0f;
+    public float MovementSpeed { get; set; }
 
     /// <summary>
     /// Create a new Projectile.

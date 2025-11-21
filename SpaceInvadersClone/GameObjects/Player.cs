@@ -2,7 +2,6 @@ using Microsoft.Xna.Framework;
 using GameLibrary;
 using GameLibrary.Graphics;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SpaceInvadersClone.GameObjects;
 

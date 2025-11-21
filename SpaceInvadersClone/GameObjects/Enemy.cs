@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GameLibrary;
 using GameLibrary.Graphics;
 using Microsoft.Xna.Framework;
@@ -282,12 +281,12 @@ public class Enemy
 
         const float HALF = 0.5f;
 
-        float middle = (LaserSprite.Width * HALF) - 1;
+        float middle = (Sprite.Width * HALF) - (LaserSprite.Width * HALF);
 
-        float correctYPosition = newLaser.Height;
+        float correctYPosition = Sprite.Height;
 
         newLaser.Position.X = Position.X + middle;
-        newLaser.Position.Y = Position.Y - correctYPosition;
+        newLaser.Position.Y = Position.Y + correctYPosition;
 
         AddLaser(newLaser);
     }

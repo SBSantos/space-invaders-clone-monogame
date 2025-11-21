@@ -13,12 +13,13 @@ public class Laser : Projectile
     public Laser(Sprite sprite) : base(sprite)
     {
         Sprite = sprite;
+        MovementSpeed = 5.0f;
         Owner = Owner.Enemy;
     }
 
     public override void Update()
     {
-        Position.Y += MOVEMENT_SPEED;
+        Position.Y += MovementSpeed;
     }
 }
 

@@ -13,12 +13,13 @@ public class Bullet : Projectile
     public Bullet(Sprite sprite) : base(sprite)
     {
         Sprite = sprite;
+        MovementSpeed = 10.0f;
         Owner = Owner.Player;
     }
 
     public override void Update()
     {
-        Position.Y -= MOVEMENT_SPEED;
+        Position.Y -= MovementSpeed;
     }
 }
 

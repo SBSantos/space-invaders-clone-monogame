@@ -120,10 +120,7 @@ public class Enemy
     /// <param name="gameTime">
     /// A snapshot of the timing values for current update cycle.
     /// </param>
-    public virtual void Update(
-        GameTime gameTime,
-        List<Enemy> enemies
-    )
+    public virtual void Update(GameTime gameTime)
     {
         Time += gameTime.ElapsedGameTime;
 
@@ -258,6 +255,19 @@ public class Enemy
                 RemoveLaser(i);
                 // player.Initialize(player.ResetPlayerPosition);
                 i--;
+            }
+
+            for (int j = 0; j < player.Bullets.Count; j++)
+            {
+                Rectangle bulletBounds = player.Bullets[j].GetBounds();
+                if (laserBounds.Intersects(bulletBounds))
+                {
+                    RemoveLaser(i);
+                    i--;
+
+                    player.RemoveBullet(j);
+                    j--;
+                }
             }
         }
     }

@@ -197,7 +197,7 @@ public class GameLoop : Core
         _shootTime += gameTime.ElapsedGameTime;
         for (int i = 0; i < _enemies.Count; i++)
         {
-            _enemies[i].Update(gameTime, _enemies);
+            _enemies[i].Update(gameTime);
             _enemies[i].ChangeDirection(_enemies, _roomBounds);
             _enemies[i].CheckCollision(_player, _roomBounds);
 

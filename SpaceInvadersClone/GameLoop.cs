@@ -20,9 +20,9 @@ public class GameLoop : Core
 
     private readonly Random _random = new();
 
-    private TimeSpan ShootTime;
+    private TimeSpan _shootTime;
 
-    private TimeSpan ShootThreshold;
+    private TimeSpan _shootThreshold;
 
     public GameLoop() : base(
         title: "SIC",
@@ -69,7 +69,7 @@ public class GameLoop : Core
         {
             // Set the threshold value for the enemy to shoot
             int thresholdValue = _enemies[0].ShootThreshold;
-            ShootThreshold = TimeSpan.FromMilliseconds(thresholdValue);
+            _shootThreshold = TimeSpan.FromMilliseconds(thresholdValue);
 
             x++;
 
@@ -194,18 +194,18 @@ public class GameLoop : Core
         _player.Update(gameTime);
         _player.CheckCollision(_roomBounds, _enemies);
 
-        ShootTime += gameTime.ElapsedGameTime;
+        _shootTime += gameTime.ElapsedGameTime;
         for (int i = 0; i < _enemies.Count; i++)
         {
             _enemies[i].Update(gameTime, _enemies);
             _enemies[i].ChangeDirection(_enemies, _roomBounds);
             _enemies[i].CheckCollision(_player, _roomBounds);
 
-            if (ShootTime >= ShootThreshold)
+            if (_shootTime >= _shootThreshold)
             {
                 int index = _random.Next(_enemies.Count);
                 _enemies[index].ShootLaser();
-                ShootTime -= ShootThreshold;
+                _shootTime -= _shootThreshold;
             }
         }
 

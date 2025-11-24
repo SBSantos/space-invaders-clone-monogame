@@ -24,6 +24,12 @@ public class GameLoop : Core
 
     private TimeSpan _shootThreshold;
 
+    private SpriteFont _font;
+
+    private Vector2 _scoreTextPosition;
+
+    private Vector2 _scoreTextOrigin;
+
     public GameLoop() : base(
         title: "SIC",
         width: 640,
@@ -95,6 +101,14 @@ public class GameLoop : Core
                 _enemies[i].Initialize(xPos, yPos);
             }
         }
+
+        _scoreTextPosition = new(
+            _roomBounds.Left,
+            _tilemap.TileHeight / 2
+        );
+
+        float scoreTextYOrigin = _font.MeasureString("Score").Y / 2;
+        _scoreTextOrigin = new(0, scoreTextYOrigin);
     }
 
     protected override void LoadContent()
@@ -183,7 +197,10 @@ public class GameLoop : Core
                     _enemies.Add(bigCrimson);
                 }
             }
+
         }
+
+        _font = Content.Load<SpriteFont>("fonts/PressStart2P-Regular");
 
         base.LoadContent();
     }
@@ -228,6 +245,18 @@ public class GameLoop : Core
         {
             _enemies[i].Draw();
         }
+
+        SpriteBatch.DrawString(
+            _font,
+            $"Score: {_player.Score}",
+            _scoreTextPosition,
+            Color.White,
+            0.0f,
+            _scoreTextOrigin,
+            1.0f,
+            SpriteEffects.None,
+            0.0f
+        );
 
         SpriteBatch.End();
 

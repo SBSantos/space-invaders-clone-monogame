@@ -18,15 +18,15 @@
             <Frame region="player-1" />
             <Frame region="player-2" />
         </Animation>
-        <Animation name="roach-animation" delay="1000">
+        <Animation name="roach-animation" delay="800">
             <Frame region="roach-1" />
             <Frame region="roach-2" />
         </Animation>
-        <Animation name="wavey-animation" delay="1000">
+        <Animation name="wavey-animation" delay="800">
             <Frame region="wavey-1" />
             <Frame region="wavey-2" />
         </Animation>
-        <Animation name="bigcrimson-animation" delay="1000">
+        <Animation name="bigcrimson-animation" delay="800">
             <Frame region="bigcrimson-1" />
             <Frame region="bigcrimson-2" />
         </Animation>

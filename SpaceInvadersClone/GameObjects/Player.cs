@@ -22,6 +22,8 @@ public class Player
     // The player position to reset.
     public Vector2 ResetPlayerPosition;
 
+    public int Score { get; set; }
+
     private const float MOVEMENT_SPEED = 5.0f;
 
     /// <summary>
@@ -223,6 +225,7 @@ public class Player
                 Rectangle enemyBounds = enemies[j].GetBounds();
                 if (bulletBounds.Intersects(enemyBounds))
                 {
+                    Score++;
                     RemoveBullet(i);
                     enemies.RemoveAt(j);
                     i--;

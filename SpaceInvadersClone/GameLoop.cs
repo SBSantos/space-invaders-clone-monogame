@@ -35,7 +35,8 @@ public class GameLoop : Core
         width: 640,
         height: 480,
         fullscreen: false
-    ) {}
+    )
+    { }
 
     protected override void Initialize()
     {

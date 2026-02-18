@@ -17,6 +17,9 @@ public class Enemy
 
     // The enemy position
     public Vector2 Position;
+
+    // The value, in milliseconds, to move the enemy down
+    private readonly double _moveDownValue;
     #endregion
 
     #region Properties
@@ -49,7 +52,7 @@ public class Enemy
     /// <summary>
     /// Define the distance to the next tile.
     /// </summary>
-    public int Pace { get; set; }
+    public float Pace { get; set; }
 
     /// <summary>
     /// The value for the enemy to jump for the next row.
@@ -70,6 +73,11 @@ public class Enemy
     /// The list of enemy's laser.
     /// </summary>
     public List<Laser> Lasers { get; set; }
+
+    /// <summary>
+    /// Timer for the enemy to move down.
+    /// </summary>
+    public TimeSpan MoveDownTimer { get; set; }
     #endregion
 
     /// <summary>
@@ -80,9 +88,10 @@ public class Enemy
     /// </param>
     /// <param name="laserSprite">
     /// The Sprite of the enemy laser.
-    /// <param>
+    /// </param>
     /// <param name="tilemap">
     /// The tilemap.
+    /// </param>
     /// <param name="row">
     /// The value of the row where the enemy should be.
     /// </param>
@@ -94,14 +103,15 @@ public class Enemy
     )
     {
         Sprite = sprite;
-        LaserSprite= laserSprite;
+        LaserSprite = laserSprite;
         Lasers = [];
         Tilemap = tilemap;
-        Pace = (int)tilemap.TileWidth / 2;
+        Pace = 0.5f;
         Row = row;
-        NextRow = 0.5f; // half a tile
         Threshold = sprite.Animation.Delay;
         ShootThreshold = 1300;
+        _moveDownValue = 500d;
+        MoveDownTimer = TimeSpan.FromMilliseconds(_moveDownValue);
     }
 
     #region Methods
@@ -129,12 +139,12 @@ public class Enemy
             // Update the animation
             Sprite.Update();
 
-            // Will move the enemies backward or forward
-            Movement();
-
             // Always reset the time to zero
             Time -= Threshold;
         }
+
+        Movement();
+        MoveDown(IsMovingDown, gameTime);
 
         UpdateLaser();
     }
@@ -163,23 +173,31 @@ public class Enemy
         );
     }
 
-    // Return a Rectangle value with the enemy position
-    // and the width and height of a tile
-    private Rectangle GetTileBounds()
-    {
-        return new Rectangle(
-            (int)Position.X,
-            (int)Position.Y,
-            (int)Tilemap.TileWidth,
-            (int)Tilemap.TileHeight
-        );
-    }
-
     // Moves the enemies left or right
     private void Movement()
     {
-        if (!IsMovingBackward) { Position.X += Pace; }
-        else { Position.X -= Pace; }
+        if (IsMovingBackward)
+        {
+            Position.X -= Pace;
+            return;
+        }
+
+        Position.X += Pace;
+    }
+
+    private void MoveDown(bool movingDown, GameTime gameTime)
+    {
+        if (movingDown)
+        {
+            Position.Y += Pace;
+
+            MoveDownTimer -= gameTime.ElapsedGameTime;
+            if (MoveDownTimer <= TimeSpan.Zero)
+            {
+                IsMovingDown = false;
+                MoveDownTimer = TimeSpan.FromMilliseconds(_moveDownValue);
+            }
+        }
     }
 
     /// <summary>
@@ -199,7 +217,7 @@ public class Enemy
     {
         for (int i = 0; i < enemies.Count; i++)
         {
-            Rectangle enemyBounds = enemies[i].GetTileBounds();
+            Rectangle enemyBounds = enemies[i].GetBounds();
 
             if (enemyBounds.Right > roomBounds.Right)
             {
@@ -213,17 +231,6 @@ public class Enemy
                 IsMovingBackward = false;
                 IsMovingDown = true;
             }
-        }
-
-        MoveDown(IsMovingDown);
-    }
-
-    private void MoveDown(bool movingDown)
-    {
-        if (movingDown)
-        {
-            Position.Y += NextRow;
-            IsMovingDown = false;
         }
     }
 

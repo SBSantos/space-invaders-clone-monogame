@@ -40,6 +40,7 @@ public class Player
         _sprite = sprite;
         _bullet = bulletSprite;
         Bullets = [];
+        Score = 0;
     }
 
     /// <summary>
@@ -235,7 +236,7 @@ public class Player
                 Rectangle enemyBounds = enemies[j].GetBounds();
                 if (bulletBounds.Intersects(enemyBounds))
                 {
-                    Score++;
+                    Score += enemies[j].Score;
                     RemoveBullet(i);
                     enemies.RemoveAt(j);
                     i--;

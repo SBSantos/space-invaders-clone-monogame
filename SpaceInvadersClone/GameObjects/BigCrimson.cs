@@ -26,6 +26,7 @@ public class BigCrimson : Enemy
         Sprite = sprite;
         LaserSprite = laserSprite;
         Row = row;
+        Score = 10;
     }
 
     public override void Initialize(

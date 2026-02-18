@@ -27,6 +27,7 @@ public class Roach : Enemy
         Sprite = sprite;
         LaserSprite = laserSprite;
         Row = row;
+        Score = 20;
     }
 
     public override void Initialize(

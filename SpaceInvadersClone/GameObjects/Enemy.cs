@@ -78,6 +78,11 @@ public class Enemy
     /// Timer for the enemy to move down.
     /// </summary>
     public TimeSpan MoveDownTimer { get; set; }
+
+    /// <summary>
+    /// Enemy score value.
+    /// </summary>
+    public int Score { get; set; }
     #endregion
 
     /// <summary>
@@ -112,6 +117,7 @@ public class Enemy
         ShootThreshold = 1300;
         _moveDownValue = 500d;
         MoveDownTimer = TimeSpan.FromMilliseconds(_moveDownValue);
+        Score = 0;
     }
 
     #region Methods

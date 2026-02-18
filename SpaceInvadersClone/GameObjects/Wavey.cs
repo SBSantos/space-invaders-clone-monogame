@@ -27,6 +27,7 @@ public class Wavey : Enemy
         Sprite = sprite;
         LaserSprite = laserSprite;
         Row = row;
+        Score = 30;
     }
 
     public override void Initialize(

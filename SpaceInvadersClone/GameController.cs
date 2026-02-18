@@ -7,18 +7,19 @@ namespace SpaceInvadersClone;
 
 public static class GameController
 {
-    private static KeyboardInfo s_keyboard => Core.Input.Keyboard;
-    private static GamePadInfo s_gamePad => Core.Input.GamePads[(int)PlayerIndex.One];
+    private static KeyboardInfo Keyboard => Core.Input.Keyboard;
+    private static GamePadInfo GamePad => Core.Input.GamePads[(int)PlayerIndex.One];
+    private static MouseInfo Mouse => Core.Input.Mouse;
 
     /// <summary>
     /// Returns true if the player has triggered the "move left" action.
     /// </summary>
     public static bool MoveLeft()
     {
-        return s_keyboard.IsKeyDown(Keys.Left) ||
-               s_keyboard.IsKeyDown(Keys.A) ||
-               s_gamePad.IsButtonDown(Buttons.DPadLeft) ||
-               s_gamePad.IsButtonDown(Buttons.LeftThumbstickLeft);
+        return Keyboard.IsKeyDown(Keys.Left) ||
+               Keyboard.IsKeyDown(Keys.A) ||
+               GamePad.IsButtonDown(Buttons.DPadLeft) ||
+               GamePad.IsButtonDown(Buttons.LeftThumbstickLeft);
     }
 
     /// <summary>
@@ -26,10 +27,10 @@ public static class GameController
     /// </summary>
     public static bool MoveRight()
     {
-        return s_keyboard.IsKeyDown(Keys.Right) ||
-               s_keyboard.IsKeyDown(Keys.D) ||
-               s_gamePad.IsButtonDown(Buttons.DPadRight) ||
-               s_gamePad.IsButtonDown(Buttons.LeftThumbstickRight);
+        return Keyboard.IsKeyDown(Keys.Right) ||
+               Keyboard.IsKeyDown(Keys.D) ||
+               GamePad.IsButtonDown(Buttons.DPadRight) ||
+               GamePad.IsButtonDown(Buttons.LeftThumbstickRight);
     }
 
     /// <summary>
@@ -37,8 +38,8 @@ public static class GameController
     /// </summary>
     public static bool Pause()
     {
-        return s_keyboard.IsKeyDown(Keys.Escape) ||
-               s_gamePad.IsButtonDown(Buttons.Start);
+        return Keyboard.IsKeyDown(Keys.Escape) ||
+               GamePad.IsButtonDown(Buttons.Start);
     }
 
     /// <summary>
@@ -46,8 +47,8 @@ public static class GameController
     /// </summary>
     public static bool Action()
     {
-        return s_keyboard.IsKeyDown(Keys.Enter) ||
-               s_gamePad.IsButtonDown(Buttons.A);
+        return Keyboard.IsKeyDown(Keys.Enter) ||
+               GamePad.IsButtonDown(Buttons.A);
     }
 
     /// <summary>
@@ -55,8 +56,28 @@ public static class GameController
     /// </summary>
     public static bool Shoot()
     {
-        return s_keyboard.WasKeyJustPressed(Keys.Space) ||
-               s_gamePad.WasButtonJustPressed(Buttons.X);
+        return Keyboard.WasKeyJustPressed(Keys.Space) ||
+               GamePad.WasButtonJustPressed(Buttons.X) ||
+               Mouse.WasButtonJustPressed(MouseInfo.MouseButton.Left);
+    }
+
+    /// <summary>
+    /// Returns mouse xy-position to control the player.
+    /// </summary>
+    /// <returns>The mouse x and y position.</returns>
+    public static Vector2 MousePosition()
+    {
+        return Mouse.Position.ToVector2();
+    }
+
+    /// <summary>
+    /// Returns true if the mouse was moved
+    /// </summary>
+    /// <returns>
+    /// True if it was moved. Otherwise, false.
+    /// </returns>
+    public static bool WasMouseMoved()
+    {
+        return Mouse.WasMoved;
     }
 }
-

@@ -69,6 +69,16 @@ public class Player
             _sprite.PlayAnimation();
             Position.X += MOVEMENT_SPEED;
         }
+        else
+        {
+            if (GameController.WasMouseMoved())
+            {
+                _sprite.PlayAnimation();
+            }
+
+            Position.X = GameController.MousePosition().X - _sprite.Width / 2;
+        }
+
         if (GameController.Shoot())
         {
             CreateNewBullet();

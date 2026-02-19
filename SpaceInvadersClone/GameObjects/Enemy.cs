@@ -262,8 +262,7 @@ public class Enemy
                 RemoveLaser(i);
                 i--;
             }
-
-            if (laserBounds.Intersects(playerBounds))
+            else if (laserBounds.Intersects(playerBounds))
             {
                 RemoveLaser(i);
                 // player.Initialize(player.ResetPlayerPosition);

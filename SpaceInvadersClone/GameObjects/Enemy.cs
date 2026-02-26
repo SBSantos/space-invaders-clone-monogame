@@ -265,6 +265,7 @@ public class Enemy
             else if (laserBounds.Intersects(playerBounds))
             {
                 RemoveLaser(i);
+                player.Lives--;
                 // player.Initialize(player.ResetPlayerPosition);
                 i--;
             }

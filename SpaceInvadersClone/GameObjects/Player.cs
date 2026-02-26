@@ -22,9 +22,11 @@ public class Player
     // The player position to reset.
     public Vector2 ResetPlayerPosition;
 
+    private const float MOVEMENT_SPEED = 5.0f;
+
     public int Score { get; set; }
 
-    private const float MOVEMENT_SPEED = 5.0f;
+    public int Lives { get; set; }
 
     /// <summary>
     /// Creates a new Player using the specified sprite.
@@ -41,6 +43,7 @@ public class Player
         _bullet = bulletSprite;
         Bullets = [];
         Score = 0;
+        Lives = 3;
     }
 
     /// <summary>
@@ -94,6 +97,9 @@ public class Player
     /// </param>
     public void Update(GameTime gameTime)
     {
+        // Stop updating
+        if (Lives <= 0) { return; }
+
         // Update the animated sprite.
         _sprite.Update(gameTime);
 
@@ -109,6 +115,9 @@ public class Player
     /// </summary>
     public void Draw()
     {
+        // Stop drawing the player.
+        if (Lives <= 0) { return; }
+
         _sprite.Draw(Core.SpriteBatch, Position);
 
         DrawBullet();

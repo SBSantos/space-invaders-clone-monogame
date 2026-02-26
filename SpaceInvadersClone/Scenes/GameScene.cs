@@ -31,6 +31,10 @@ public class GameScene : Scene
 
     private Vector2 _scoreTextOrigin;
 
+    private Vector2 _livesTextPosition;
+
+    private Vector2 _livesTextOrigin;
+
     public override void Initialize()
     {
         // TODO: Add your initialization logic here
@@ -108,6 +112,14 @@ public class GameScene : Scene
 
         float scoreTextYOrigin = _font.MeasureString("Score").Y / 2;
         _scoreTextOrigin = new(0, scoreTextYOrigin);
+
+        _livesTextPosition = new(
+            _roomBounds.Center.X * 1.5f,
+            _tilemap.TileHeight / 2
+        );
+
+        float livesTextYOrigin = _font.MeasureString("Lives").Y / 2;
+        _livesTextOrigin = new(0, livesTextYOrigin);
     }
 
     public override void LoadContent()
@@ -241,6 +253,7 @@ public class GameScene : Scene
             _enemies[i].Draw();
         }
 
+        // Draw player score
         Core.SpriteBatch.DrawString(
             _font,
             $"Score: {_player.Score}",
@@ -248,6 +261,19 @@ public class GameScene : Scene
             Color.White,
             0.0f,
             _scoreTextOrigin,
+            1.0f,
+            SpriteEffects.None,
+            0.0f
+        );
+
+        // Draw player lives count
+        Core.SpriteBatch.DrawString(
+            _font,
+            $"Lives: {_player.Lives}",
+            _livesTextPosition,
+            Color.White,
+            0.0f,
+            _livesTextOrigin,
             1.0f,
             SpriteEffects.None,
             0.0f

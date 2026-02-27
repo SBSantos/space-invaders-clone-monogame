@@ -220,10 +220,15 @@ public class GameScene : Scene
         _player.Update(gameTime);
         _player.CheckCollision(_roomBounds, _enemies);
 
+        // Stop updating the enemies when player is dead.
+        if (_player.PlayerState == PlayerState.Dead) { return; }
+
         _shootTime += gameTime.ElapsedGameTime;
         for (int i = 0; i < _enemies.Count; i++)
         {
             _enemies[i].Update(gameTime);
+            _enemies[i].UpdateMovement(gameTime);
+            _enemies[i].UpdateLaser();
             _enemies[i].ChangeDirection(_enemies, _roomBounds);
             _enemies[i].CheckCollision(_player, _roomBounds);
 
@@ -251,6 +256,7 @@ public class GameScene : Scene
         for (int i = 0; i < _enemies.Count; i++)
         {
             _enemies[i].Draw();
+            _enemies[i].DrawLaser();
         }
 
         // Draw player score

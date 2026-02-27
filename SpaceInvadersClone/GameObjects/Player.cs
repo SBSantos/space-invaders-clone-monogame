@@ -2,8 +2,16 @@ using Microsoft.Xna.Framework;
 using GameLibrary;
 using GameLibrary.Graphics;
 using System.Collections.Generic;
+using System;
+using System.ComponentModel;
 
 namespace SpaceInvadersClone.GameObjects;
+
+public enum PlayerState
+{
+    Dead,
+    Alive
+}
 
 public class Player
 {
@@ -12,6 +20,10 @@ public class Player
 
     // The bullet sprite.
     private readonly Sprite _bullet;
+
+    private TimeSpan _deadPlayerTimer;
+
+    private TimeSpan _deadPlayerTimerThreshold;
 
     // A list of Player's bullet.
     public List<Bullet> Bullets;
@@ -27,6 +39,8 @@ public class Player
     public int Score { get; set; }
 
     public int Lives { get; set; }
+
+    public PlayerState PlayerState { get; set; }
 
     /// <summary>
     /// Creates a new Player using the specified sprite.
@@ -44,6 +58,8 @@ public class Player
         Bullets = [];
         Score = 0;
         Lives = 3;
+        PlayerState = PlayerState.Alive;
+        _deadPlayerTimerThreshold = TimeSpan.FromSeconds(3);
     }
 
     /// <summary>
@@ -103,11 +119,24 @@ public class Player
         // Update the animated sprite.
         _sprite.Update(gameTime);
 
-        // Handle any player input.
-        HandleInput();
+        // When player state is dead state, switch it to alive state.
+        if (PlayerState == PlayerState.Dead)
+        {
+            _deadPlayerTimer += gameTime.ElapsedGameTime;
+            if (_deadPlayerTimer >= _deadPlayerTimerThreshold)
+            {
+                PlayerState = PlayerState.Alive;
+                _deadPlayerTimer = TimeSpan.Zero;
+            }
+        }
+        else
+        {
+            // Handle any player input.
+            HandleInput();
 
-        // Update the bullet.
-        UpdateBullet();
+            // Update the bullet.
+            UpdateBullet();
+        }
     }
 
     /// <summary>
@@ -116,7 +145,7 @@ public class Player
     public void Draw()
     {
         // Stop drawing the player.
-        if (Lives <= 0) { return; }
+        if (Lives <= 0 || PlayerState == PlayerState.Dead) { return; }
 
         _sprite.Draw(Core.SpriteBatch, Position);
 

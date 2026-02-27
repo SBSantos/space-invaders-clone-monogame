@@ -148,11 +148,6 @@ public class Enemy
             // Always reset the time to zero
             Time -= Threshold;
         }
-
-        Movement();
-        MoveDown(IsMovingDown, gameTime);
-
-        UpdateLaser();
     }
 
     /// <summary>
@@ -161,8 +156,6 @@ public class Enemy
     public virtual void Draw()
     {
         Sprite.Draw(Core.SpriteBatch, Position);
-
-        DrawLaser();
     }
 
     /// <summary>
@@ -180,15 +173,18 @@ public class Enemy
     }
 
     // Moves the enemies left or right
-    private void Movement()
+    public void UpdateMovement(GameTime gameTime)
     {
         if (IsMovingBackward)
         {
             Position.X -= Pace;
-            return;
+        }
+        else
+        {
+            Position.X += Pace;
         }
 
-        Position.X += Pace;
+        MoveDown(IsMovingDown, gameTime); ;
     }
 
     private void MoveDown(bool movingDown, GameTime gameTime)
@@ -225,14 +221,13 @@ public class Enemy
         {
             Rectangle enemyBounds = enemies[i].GetBounds();
 
+            float leftSidePos = enemyBounds.X - (enemyBounds.Width / 2);
             if (enemyBounds.Right > roomBounds.Right)
             {
                 IsMovingBackward = true;
                 IsMovingDown = true;
             }
-
-            float leftSidePos = enemyBounds.X - (enemyBounds.Width / 2);
-            if (leftSidePos < roomBounds.Left)
+            else if (leftSidePos < roomBounds.Left)
             {
                 IsMovingBackward = false;
                 IsMovingDown = true;
@@ -266,7 +261,7 @@ public class Enemy
             {
                 RemoveLaser(i);
                 player.Lives--;
-                // player.Initialize(player.ResetPlayerPosition);
+                player.PlayerState = PlayerState.Dead;
                 i--;
             }
 
@@ -314,7 +309,7 @@ public class Enemy
         AddLaser(newLaser);
     }
 
-    private void UpdateLaser()
+    public void UpdateLaser()
     {
         for (int i = 0; i < Lasers.Count; i++)
         {
@@ -322,7 +317,7 @@ public class Enemy
         }
     }
 
-    private void DrawLaser()
+    public void DrawLaser()
     {
         for (int i = 0; i < Lasers.Count; i++)
         {

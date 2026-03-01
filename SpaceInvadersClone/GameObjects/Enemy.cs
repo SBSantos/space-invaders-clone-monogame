@@ -138,16 +138,9 @@ public class Enemy
     /// </param>
     public virtual void Update(GameTime gameTime)
     {
-        Time += gameTime.ElapsedGameTime;
+        // Time += gameTime.ElapsedGameTime;
 
-        if (Time >= Threshold)
-        {
-            // Update the animation
-            Sprite.Update();
-
-            // Always reset the time to zero
-            Time -= Threshold;
-        }
+        Sprite.Update(gameTime);
     }
 
     /// <summary>
@@ -184,7 +177,7 @@ public class Enemy
             Position.X += Pace;
         }
 
-        MoveDown(IsMovingDown, gameTime); ;
+        MoveDown(IsMovingDown, gameTime);
     }
 
     private void MoveDown(bool movingDown, GameTime gameTime)

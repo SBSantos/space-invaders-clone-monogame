@@ -4,6 +4,7 @@ using GameLibrary.Graphics;
 using System.Collections.Generic;
 using System;
 using System.ComponentModel;
+using SpaceInvadersClone.Systems;
 
 namespace SpaceInvadersClone.GameObjects;
 
@@ -238,7 +239,7 @@ public class Player
     /// </param>
     public void CheckCollision(
         Rectangle roomBounds,
-        List<Enemy> enemies
+        EnemyFormationSystem enemyFormation
     )
     {
         Rectangle playerBounds = GetBounds();
@@ -251,12 +252,12 @@ public class Player
             Position.X = roomBounds.Right - playerBounds.Width;
         }
 
-        CheckBulletCollision(enemies, roomBounds);
+        CheckBulletCollision(enemyFormation, roomBounds);
     }
 
     // Manages the collision of bullets.
     public void CheckBulletCollision(
-        List<Enemy> enemies,
+        EnemyFormationSystem enemyFormation,
         Rectangle roomBounds
     )
     {
@@ -269,14 +270,14 @@ public class Player
                 i--;
             }
 
-            for (int j = 0; j < enemies.Count; j++)
+            for (int j = 0; j < enemyFormation.Enemies.Count; j++)
             {
-                Rectangle enemyBounds = enemies[j].GetBounds();
+                Rectangle enemyBounds = enemyFormation.Enemies[j].GetBounds();
                 if (bulletBounds.Intersects(enemyBounds))
                 {
-                    Score += enemies[j].Score;
+                    Score += enemyFormation.Enemies[j].Score;
                     RemoveBullet(i);
-                    enemies.RemoveAt(j);
+                    enemyFormation.Enemies.RemoveAt(j);
                     i--;
                 }
             }

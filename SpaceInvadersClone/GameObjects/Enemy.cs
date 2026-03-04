@@ -138,8 +138,6 @@ public class Enemy
     /// </param>
     public virtual void Update(GameTime gameTime)
     {
-        // Time += gameTime.ElapsedGameTime;
-
         Sprite.Update(gameTime);
     }
 
@@ -165,7 +163,12 @@ public class Enemy
         );
     }
 
-    // Moves the enemies left or right
+    /// <summary>
+    /// Move the enemies left, right or dowm.
+    /// </summary>
+    /// <param name="gameTime">
+    /// A snapshot of the timing values for current update cycle.
+    /// </param>
     public void UpdateMovement(GameTime gameTime)
     {
         if (IsMovingBackward)
@@ -228,57 +231,18 @@ public class Enemy
         }
     }
 
-    /// <summary>
-    /// Checks for player collision.
-    /// </summary>
-    /// <param name="player">
-    /// The player to check collision.
-    /// </param>
-    /// <param name="roomBounds">
-    /// A rectangle representing the boundaries of the room.
-    /// </param>
-    public virtual void CheckCollision(
-        Player player,
-        Rectangle roomBounds)
-    {
-        Rectangle playerBounds = player.GetBounds();
-        for (int i = 0; i < Lasers.Count; i++)
-        {
-            Rectangle laserBounds = Lasers[i].GetBounds();
-            if (laserBounds.Bottom >= roomBounds.Bottom)
-            {
-                RemoveLaser(i);
-                i--;
-            }
-            else if (laserBounds.Intersects(playerBounds))
-            {
-                RemoveLaser(i);
-                player.Lives--;
-                player.PlayerState = PlayerState.Dead;
-                i--;
-            }
-
-            for (int j = 0; j < player.Bullets.Count; j++)
-            {
-                Rectangle bulletBounds = player.Bullets[j].GetBounds();
-                if (laserBounds.Intersects(bulletBounds))
-                {
-                    RemoveLaser(i);
-                    i--;
-
-                    player.RemoveBullet(j);
-                    j--;
-                }
-            }
-        }
-    }
-
     private void AddLaser(Laser laser)
     {
         Lasers.Add(laser);
     }
 
-    private void RemoveLaser(int index)
+    /// <summary>
+    /// Removes a enemy laser from the list.
+    /// </summary>
+    /// <param name="index">
+    /// The index of a specified laser.
+    /// </param>
+    public void RemoveLaser(int index)
     {
         Lasers.RemoveAt(index);
     }
@@ -302,6 +266,9 @@ public class Enemy
         AddLaser(newLaser);
     }
 
+    /// <summary>
+    /// Update the lasers.
+    /// </summary>
     public void UpdateLaser()
     {
         for (int i = 0; i < Lasers.Count; i++)
@@ -310,6 +277,9 @@ public class Enemy
         }
     }
 
+    /// <summary>
+    /// Draw the lasers.
+    /// </summary>
     public void DrawLaser()
     {
         for (int i = 0; i < Lasers.Count; i++)

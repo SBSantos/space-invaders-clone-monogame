@@ -3,8 +3,6 @@ using GameLibrary;
 using GameLibrary.Graphics;
 using System.Collections.Generic;
 using System;
-using System.ComponentModel;
-using SpaceInvadersClone.Systems;
 
 namespace SpaceInvadersClone.GameObjects;
 
@@ -234,13 +232,7 @@ public class Player
     /// <param name="roomBounds">
     /// A rectangle representing the boundaries of the room
     /// </param>
-    /// <param name="enemies">
-    /// An Enemy list.
-    /// </param>
-    public void CheckCollision(
-        Rectangle roomBounds,
-        EnemyFormationSystem enemyFormation
-    )
+    public void CheckCollision(Rectangle roomBounds)
     {
         Rectangle playerBounds = GetBounds();
         if (playerBounds.Left < roomBounds.Left)
@@ -251,36 +243,33 @@ public class Player
         {
             Position.X = roomBounds.Right - playerBounds.Width;
         }
-
-        CheckBulletCollision(enemyFormation, roomBounds);
     }
 
-    // Manages the collision of bullets.
-    public void CheckBulletCollision(
-        EnemyFormationSystem enemyFormation,
-        Rectangle roomBounds
+    /// <summary>
+    /// Increase player's score.
+    /// </summary>
+    /// <param name="enemies">
+    /// The list of enemies.
+    /// </param>
+    /// <param name="index">
+    /// The enemy index.
+    /// </param>
+    public void IncreaseScore(
+        List<Enemy> enemies,
+        int index
     )
     {
-        for (int i = 0; i < Bullets.Count; i++)
-        {
-            Rectangle bulletBounds = Bullets[i].GetBounds();
-            if (bulletBounds.Top <= roomBounds.Top)
-            {
-                RemoveBullet(i);
-                i--;
-            }
+        Score += enemies[index].Score;
+    }
 
-            for (int j = 0; j < enemyFormation.Enemies.Count; j++)
-            {
-                Rectangle enemyBounds = enemyFormation.Enemies[j].GetBounds();
-                if (bulletBounds.Intersects(enemyBounds))
-                {
-                    Score += enemyFormation.Enemies[j].Score;
-                    RemoveBullet(i);
-                    enemyFormation.Enemies.RemoveAt(j);
-                    i--;
-                }
-            }
-        }
+    /// <summary>
+    /// The player's death.
+    /// </summary>
+    public void Death()
+    {
+        // if player is dead, make it imortal for a little time.
+
+        Lives--;
+        PlayerState = PlayerState.Dead;
     }
 }

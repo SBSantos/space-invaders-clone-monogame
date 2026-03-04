@@ -1,4 +1,3 @@
-using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using GameLibrary;
@@ -115,8 +114,27 @@ public class GameScene : Scene
     {
         // TODO: Add your update logic here
         _player.Update(gameTime);
-        _player.CheckCollision(_roomBounds, _enemyFormation);
+        _player.CheckCollision(_roomBounds);
+        CollisionSystem.CheckPlayerVsEnemyCollision(
+            _player,
+            _enemyFormation.Enemies,
+            _roomBounds
+        );
+
         _enemyFormation.Update(gameTime, _player, _roomBounds);
+        for (int i = 0; i < _enemyFormation.Enemies.Count; i++)
+        {
+            CollisionSystem.CheckEnemyVsPlayerCollision(
+                _enemyFormation.Enemies, i,
+                _player,
+                _roomBounds
+            );
+
+            CollisionSystem.CheckLaserVsBulletCollision(
+                _enemyFormation.Enemies, i,
+                _player
+            );
+        }
     }
 
     public override void Draw(GameTime gameTime)

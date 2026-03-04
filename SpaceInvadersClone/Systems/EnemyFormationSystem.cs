@@ -138,7 +138,6 @@ public class EnemyFormationSystem
             Enemies[i].UpdateMovement(gameTime);
             Enemies[i].UpdateLaser();
             Enemies[i].ChangeDirection(Enemies, roomBounds);
-            Enemies[i].CheckCollision(player, roomBounds);
 
             if (_shootTime >= _shootThreshold)
             {

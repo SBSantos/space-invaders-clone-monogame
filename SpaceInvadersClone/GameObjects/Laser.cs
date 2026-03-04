@@ -14,7 +14,6 @@ public class Laser : Projectile
     {
         Sprite = sprite;
         MovementSpeed = 5.0f;
-        Owner = Owner.Enemy;
     }
 
     public override void Update()
@@ -22,4 +21,3 @@ public class Laser : Projectile
         Position.Y += MovementSpeed;
     }
 }
-

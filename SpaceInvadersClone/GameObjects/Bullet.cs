@@ -14,7 +14,6 @@ public class Bullet : Projectile
     {
         Sprite = sprite;
         MovementSpeed = 10.0f;
-        Owner = Owner.Player;
     }
 
     public override void Update()
@@ -22,4 +21,3 @@ public class Bullet : Projectile
         Position.Y -= MovementSpeed;
     }
 }
-

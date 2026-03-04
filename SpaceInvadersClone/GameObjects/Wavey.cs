@@ -1,5 +1,3 @@
-using System;
-using Microsoft.Xna.Framework;
 using GameLibrary.Graphics;
 
 namespace SpaceInvadersClone.GameObjects;

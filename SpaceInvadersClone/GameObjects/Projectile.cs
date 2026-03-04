@@ -4,12 +4,6 @@ using Microsoft.Xna.Framework;
 
 namespace SpaceInvadersClone.GameObjects;
 
-public enum Owner
-{
-    Player,
-    Enemy
-}
-
 public class Projectile
 {
     // The TextureRegion of this projectile.
@@ -30,11 +24,6 @@ public class Projectile
     /// The Height of this projectile.
     /// </summary>
     public float Height => Sprite.Height;
-
-    /// <summary>
-    /// The Owner of this projectile.
-    /// </summary>
-    public Owner Owner { get; set; }
 
     public float MovementSpeed { get; set; }
 
@@ -65,7 +54,7 @@ public class Projectile
     /// <summary>
     /// Update the Projectile.
     /// </summary>
-    public virtual void Update() {}
+    public virtual void Update() { }
 
     /// <summary>
     /// Draw the Projectile.

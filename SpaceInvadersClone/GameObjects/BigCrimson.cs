@@ -1,4 +1,3 @@
-using System;
 using GameLibrary.Graphics;
 
 namespace SpaceInvadersClone.GameObjects;

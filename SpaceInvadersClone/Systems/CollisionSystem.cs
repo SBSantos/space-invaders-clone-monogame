@@ -77,7 +77,7 @@ public static class CollisionSystem
 
         if (enemyBounds.Intersects(playerBounds))
         {
-            // Player dead logic here, but to avoid infinite death 
+            // Player's death logic here, but to avoid infinite death 
             // this will be blanked.
         }
 
@@ -135,5 +135,43 @@ public static class CollisionSystem
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Check if enemies has hit the borders of the room.
+    /// </summary>
+    /// <param name="enemies">The enemy list</param>
+    /// <param name="direction">Enemy's direction.</param>
+    /// <param name="roomBounds">A rectangle representing the boundaries of the room.</param>
+    /// <returns>True if hit the borders. Otherwise, false.</returns>
+    public static bool CheckEnemyHitBorders(
+        List<Enemy> enemies,
+        int direction,
+        Rectangle roomBounds
+    )
+    {
+        for (int i = 0; i < enemies.Count; i++)
+        {
+            Rectangle enemyBounds = enemies[i].GetBounds();
+
+            float leftSidePos = enemyBounds.X - (enemyBounds.Width / 2);
+
+            if (direction == 1)
+            {
+                if (enemyBounds.Right >= roomBounds.Right)
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (leftSidePos <= roomBounds.Left)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

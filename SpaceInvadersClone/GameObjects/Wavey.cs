@@ -10,15 +10,19 @@ public class Wavey : Enemy
     /// <param name="sprite">
     /// The AnimatedSprite to use when drawing the wavey.
     /// </param>
+    /// <param name="laserSprite">
+    /// The Sprite to use when drawing the laser.
+    /// </param>
+    /// <param name="row">
+    /// The row value.
+    /// </param>
     public Wavey(
         AnimatedSprite sprite,
         Sprite laserSprite,
-        Tilemap tilemap,
         int row
     ) : base(
         sprite,
         laserSprite,
-        tilemap,
         row
     )
     {

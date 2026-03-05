@@ -5,6 +5,7 @@ using GameLibrary.Graphics;
 using GameLibrary.Scenes;
 using SpaceInvadersClone.GameObjects;
 using SpaceInvadersClone.Systems;
+using SpaceInvadersClone.Managers;
 
 namespace SpaceInvadersClone.Scenes;
 
@@ -12,7 +13,7 @@ public class GameScene : Scene
 {
     private Player _player;
 
-    private EnemyFormationSystem _enemyFormation = new();
+    private EnemyManager _enemy;
 
     private Tilemap _tilemap;
 
@@ -58,7 +59,7 @@ public class GameScene : Scene
         );
         _player.Initialize(playerPosition);
 
-        _enemyFormation.Initialize(_tilemap);
+        _enemy.Initialize();
 
         _scoreTextPosition = new(
             _roomBounds.Left,
@@ -105,7 +106,8 @@ public class GameScene : Scene
 
         _player = new(playerAnimation, bulletSprite);
 
-        _enemyFormation.LoadContent(atlas, _tilemap, SCALE);
+        _enemy = new(_tilemap);
+        _enemy.LoadContent(atlas, SCALE);
 
         _font = Core.Content.Load<SpriteFont>("fonts/PressStart2P-Regular");
     }
@@ -117,21 +119,21 @@ public class GameScene : Scene
         _player.CheckCollision(_roomBounds);
         CollisionSystem.CheckPlayerVsEnemyCollision(
             _player,
-            _enemyFormation.Enemies,
+            _enemy.EnemyFormation.Enemies,
             _roomBounds
         );
 
-        _enemyFormation.Update(gameTime, _player, _roomBounds);
-        for (int i = 0; i < _enemyFormation.Enemies.Count; i++)
+        _enemy.Update(gameTime, _player, _roomBounds);
+        for (int i = 0; i < _enemy.EnemyFormation.Enemies.Count; i++)
         {
             CollisionSystem.CheckEnemyVsPlayerCollision(
-                _enemyFormation.Enemies, i,
+                _enemy.EnemyFormation.Enemies, i,
                 _player,
                 _roomBounds
             );
 
             CollisionSystem.CheckLaserVsBulletCollision(
-                _enemyFormation.Enemies, i,
+                _enemy.EnemyFormation.Enemies, i,
                 _player
             );
         }
@@ -149,7 +151,7 @@ public class GameScene : Scene
 
         _player.Draw();
 
-        _enemyFormation.Draw();
+        _enemy.Draw();
 
         // Draw player score
         Core.SpriteBatch.DrawString(

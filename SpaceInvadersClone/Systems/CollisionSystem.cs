@@ -50,6 +50,31 @@ public static class CollisionSystem
     }
 
     /// <summary>
+    /// Checks the player's collision on the boundaries of the room.
+    /// </summary>
+    /// <param name="player">
+    /// The player.
+    /// </param>
+    /// <param name="roomBounds">
+    /// A rectangle representing the boundaries of the room
+    /// </param>
+    public static void CheckPlayerHitMapEdge(
+        Player player,
+        Rectangle roomBounds
+    )
+    {
+        Rectangle playerBounds = player.GetBounds();
+        if (playerBounds.Left < roomBounds.Left)
+        {
+            player.Position.X = roomBounds.Left;
+        }
+        else if (playerBounds.Right > roomBounds.Right)
+        {
+            player.Position.X = roomBounds.Right - playerBounds.Width;
+        }
+    }
+
+    /// <summary>
     /// Check enemies collision against the player.
     /// </summary>
     /// <param name="enemies">
@@ -138,13 +163,13 @@ public static class CollisionSystem
     }
 
     /// <summary>
-    /// Check if enemies has hit the borders of the room.
+    /// Check enemies collision on the boundaries of the room.
     /// </summary>
     /// <param name="enemies">The enemy list</param>
     /// <param name="direction">Enemy's direction.</param>
     /// <param name="roomBounds">A rectangle representing the boundaries of the room.</param>
-    /// <returns>True if hit the borders. Otherwise, false.</returns>
-    public static bool CheckEnemyHitBorders(
+    /// <returns>True if collides. Otherwise, false.</returns>
+    public static bool CheckEnemyHitMapEdge(
         List<Enemy> enemies,
         int direction,
         Rectangle roomBounds

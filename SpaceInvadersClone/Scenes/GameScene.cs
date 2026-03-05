@@ -116,7 +116,7 @@ public class GameScene : Scene
     {
         // TODO: Add your update logic here
         _player.Update(gameTime);
-        _player.CheckCollision(_roomBounds);
+        CollisionSystem.CheckPlayerHitMapEdge(_player, _roomBounds);
         CollisionSystem.CheckPlayerVsEnemyCollision(
             _player,
             _enemy.EnemyFormation.Enemies,

@@ -227,25 +227,6 @@ public class Player
     }
 
     /// <summary>
-    /// Checks the player collision.
-    /// </summary>
-    /// <param name="roomBounds">
-    /// A rectangle representing the boundaries of the room
-    /// </param>
-    public void CheckCollision(Rectangle roomBounds)
-    {
-        Rectangle playerBounds = GetBounds();
-        if (playerBounds.Left < roomBounds.Left)
-        {
-            Position.X = roomBounds.Left;
-        }
-        else if (playerBounds.Right > roomBounds.Right)
-        {
-            Position.X = roomBounds.Right - playerBounds.Width;
-        }
-    }
-
-    /// <summary>
     /// Increase player's score.
     /// </summary>
     /// <param name="enemies">

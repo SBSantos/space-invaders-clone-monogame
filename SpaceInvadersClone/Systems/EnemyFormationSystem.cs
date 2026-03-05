@@ -50,7 +50,7 @@ public class EnemyFormationSystem
     {
         float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-        if (CollisionSystem.CheckEnemyHitBorders(Enemies, _direction, roomBounds))
+        if (CollisionSystem.CheckEnemyHitMapEdge(Enemies, _direction, roomBounds))
         {
             for (int i = 0; i < Enemies.Count; i++)
             {

@@ -148,11 +148,15 @@ public class GameScene : Scene
         {
             CollisionSystem.CheckEnemyVsPlayerCollision(
                 _enemy.EnemyFormation.Enemies, i,
-                _lasers,
-                _player,
-                _roomBounds
+                _player
             );
         }
+
+        CollisionSystem.CheckLaserVsPlayerCollision(
+            _lasers,
+            _player,
+            _roomBounds
+        );
 
         CollisionSystem.CheckLaserVsBulletCollision(_lasers, _bullets);
     }

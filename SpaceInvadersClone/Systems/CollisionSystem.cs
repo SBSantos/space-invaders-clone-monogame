@@ -88,21 +88,13 @@ public static class CollisionSystem
     /// <param name="enemyIndex">
     /// The enemy index.
     /// </param>
-    /// <param name="lasers">
-    /// A list of enemy lasers.
-    /// </param>
     /// <param name="player">
     /// The player to check collision.
-    /// </param>
-    /// <param name="roomBounds">
-    /// A rectangle representing the boundaries of the room.
     /// </param>
     public static void CheckEnemyVsPlayerCollision(
         List<Enemy> enemies,
         int enemyIndex,
-        List<Laser> lasers,
-        Player player,
-        Rectangle roomBounds
+        Player player
     )
     {
         Rectangle enemyBounds = enemies[enemyIndex].GetBounds();
@@ -114,10 +106,22 @@ public static class CollisionSystem
             // Player's death logic here, but to avoid infinite death 
             // this will be blanked.
         }
+    }
 
-        // When the last enemy is dead and this same enemy shooted
-        // before die, it's laser goes beyond the limits of the room.
-        // This shouldn't happen.
+    /// <summary>
+    /// Check enemy lasers collision against the player.
+    /// </summary>
+    /// <param name="lasers">A list of enemy lasers.</param>
+    /// <param name="player">The player to check collision.</param>
+    /// <param name="roomBounds">A rectangle representing the boundaries of the room.</param>
+    public static void CheckLaserVsPlayerCollision(
+        List<Laser> lasers,
+        Player player,
+        Rectangle roomBounds
+    )
+    {
+        Rectangle playerBounds = player.GetBounds();
+
         for (int i = 0; i < lasers.Count; i++)
         {
             Rectangle laserBounds = lasers[i].GetBounds();

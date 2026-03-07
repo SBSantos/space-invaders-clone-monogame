@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using GameLibrary.Graphics;
 using Microsoft.Xna.Framework;
 using SpaceInvadersClone.GameObjects;
@@ -153,10 +154,12 @@ public class EnemyManager
     /// Update the enemies.
     /// </summary>
     /// <param name="gameTime">A snapshot of the timing values for current update cycle.</param>
+    /// <param name="lasers">A list of enemy lasers.</param>
     /// <param name="player">The player.</param>
     /// <param name="roomBounds">A rectangle representing the boundaries of the room.</param>
     public void Update(
         GameTime gameTime,
+        List<Laser> lasers,
         Player player,
         Rectangle roomBounds
     )
@@ -167,17 +170,16 @@ public class EnemyManager
         // if hit the borders of the map.
         EnemyFormation.Update(gameTime, roomBounds);
 
-        // update the sprite, laser and shooting time.
+        // update the sprite and shooting time.
         _shootingTimer += gameTime.ElapsedGameTime;
         for (int i = 0; i < EnemyFormation.Enemies.Count; i++)
         {
             EnemyFormation.Enemies[i].Update(gameTime);
-            EnemyFormation.Enemies[i].UpdateLaser();
 
             if (_shootingTimer >= _shootingTimerThreshold)
             {
                 int index = _random.Next(EnemyFormation.Enemies.Count);
-                EnemyFormation.Enemies[index].ShootLaser();
+                EnemyFormation.Enemies[index].ShootLaser(lasers);
                 _shootingTimer -= _shootingTimerThreshold;
             }
         }
@@ -191,7 +193,6 @@ public class EnemyManager
         for (int i = 0; i < EnemyFormation.Enemies.Count; i++)
         {
             EnemyFormation.Enemies[i].Draw();
-            EnemyFormation.Enemies[i].DrawLaser();
         }
     }
 }

@@ -20,12 +20,11 @@ public class Player
     // The bullet sprite.
     private readonly Sprite _bullet;
 
+    // The timer when the player is dead.
     private TimeSpan _deadPlayerTimer;
 
+    // The threshold of the timer.
     private TimeSpan _deadPlayerTimerThreshold;
-
-    // A list of Player's bullet.
-    public List<Bullet> Bullets;
 
     // The player position.
     public Vector2 Position;
@@ -35,10 +34,19 @@ public class Player
 
     private const float MOVEMENT_SPEED = 5.0f;
 
+    /// <summary>
+    /// Gets or sets the player's score.
+    /// </summary>
     public int Score { get; set; }
 
+    /// <summary>
+    /// Gets or sets the player's lives.
+    /// </summary>
     public int Lives { get; set; }
 
+    /// <summary>
+    /// Gets or sets the player's state.
+    /// </summary>
     public PlayerState PlayerState { get; set; }
 
     /// <summary>
@@ -54,7 +62,6 @@ public class Player
     {
         _sprite = sprite;
         _bullet = bulletSprite;
-        Bullets = [];
         Score = 0;
         Lives = 3;
         PlayerState = PlayerState.Alive;
@@ -72,7 +79,7 @@ public class Player
     }
 
     // Handles input given by the player.
-    private void HandleInput()
+    private void HandleInput(List<Bullet> bullets)
     {
         // Stops animation until an action occurs
         _sprite.StopAnimation();
@@ -100,7 +107,7 @@ public class Player
 
         if (GameController.Shoot())
         {
-            CreateNewBullet();
+            CreateNewBullet(bullets);
         }
     }
 
@@ -110,7 +117,10 @@ public class Player
     /// <param name="gameTime">
     /// A snapshot of the timing values for current update cycle.
     /// </param>
-    public void Update(GameTime gameTime)
+    /// <param name="bullets">
+    /// A list of player's bullets.
+    /// </param>
+    public void Update(GameTime gameTime, List<Bullet> bullets)
     {
         // Stop updating
         if (Lives <= 0) { return; }
@@ -131,10 +141,7 @@ public class Player
         else
         {
             // Handle any player input.
-            HandleInput();
-
-            // Update the bullet.
-            UpdateBullet();
+            HandleInput(bullets);
         }
     }
 
@@ -147,8 +154,6 @@ public class Player
         if (Lives <= 0 || PlayerState == PlayerState.Dead) { return; }
 
         _sprite.Draw(Core.SpriteBatch, Position);
-
-        DrawBullet();
     }
 
     /// <summary>
@@ -166,29 +171,7 @@ public class Player
         );
     }
 
-    /// <summary>
-    /// Add a bullet to the list.
-    /// </summary>
-    /// <param name="bullet">
-    /// The bullet to add.
-    /// </param>
-    public void AddBullet(Bullet bullet)
-    {
-        Bullets.Add(bullet);
-    }
-
-    /// <summary>
-    /// Removes a bullet in the list by a given index.
-    /// </summary>
-    /// <param name="index">
-    /// The index to remove the bullet.
-    /// </param>
-    public void RemoveBullet(int index)
-    {
-        Bullets.RemoveAt(index);
-    }
-
-    private void CreateNewBullet()
+    private void CreateNewBullet(List<Bullet> bullets)
     {
         Bullet newBullet = new(_bullet);
 
@@ -207,23 +190,7 @@ public class Player
         newBullet.Position.X = Position.X + middle;
         newBullet.Position.Y = Position.Y - correctYPosition;
 
-        AddBullet(newBullet);
-    }
-
-    private void UpdateBullet()
-    {
-        for (int i = 0; i < Bullets.Count; i++)
-        {
-            Bullets[i].Update();
-        }
-    }
-
-    private void DrawBullet()
-    {
-        for (int i = 0; i < Bullets.Count; i++)
-        {
-            Bullets[i].Draw();
-        }
+        bullets.Add(newBullet);
     }
 
     /// <summary>

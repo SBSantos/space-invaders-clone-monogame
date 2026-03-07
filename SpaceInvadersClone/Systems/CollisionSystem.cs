@@ -12,6 +12,9 @@ public static class CollisionSystem
     /// <param name="player">
     /// The player to check collision.
     /// </param>
+    /// <param name="bullets">
+    /// A list of player's bullets.
+    /// </param>
     /// <param name="enemies">
     /// The list of enemies to check collision.
     /// </param>
@@ -20,16 +23,17 @@ public static class CollisionSystem
     /// </param>
     public static void CheckPlayerVsEnemyCollision(
         Player player,
+        List<Bullet> bullets,
         List<Enemy> enemies,
         Rectangle roomBounds
     )
     {
-        for (int i = 0; i < player.Bullets.Count; i++)
+        for (int i = 0; i < bullets.Count; i++)
         {
-            Rectangle bulletBounds = player.Bullets[i].GetBounds();
+            Rectangle bulletBounds = bullets[i].GetBounds();
             if (bulletBounds.Top <= roomBounds.Top)
             {
-                player.RemoveBullet(i);
+                bullets.RemoveAt(i);
                 i--;
             }
 
@@ -39,7 +43,8 @@ public static class CollisionSystem
                 if (bulletBounds.Intersects(enemyBounds))
                 {
                     player.IncreaseScore(enemies, j);
-                    player.RemoveBullet(i);
+
+                    bullets.RemoveAt(i);
                     i--;
 
                     enemies.RemoveAt(j);
@@ -83,6 +88,9 @@ public static class CollisionSystem
     /// <param name="enemyIndex">
     /// The enemy index.
     /// </param>
+    /// <param name="lasers">
+    /// A list of enemy lasers.
+    /// </param>
     /// <param name="player">
     /// The player to check collision.
     /// </param>
@@ -92,6 +100,7 @@ public static class CollisionSystem
     public static void CheckEnemyVsPlayerCollision(
         List<Enemy> enemies,
         int enemyIndex,
+        List<Laser> lasers,
         Player player,
         Rectangle roomBounds
     )
@@ -106,18 +115,21 @@ public static class CollisionSystem
             // this will be blanked.
         }
 
-        for (int i = 0; i < enemies[enemyIndex].Lasers.Count; i++)
+        // When the last enemy is dead and this same enemy shooted
+        // before die, it's laser goes beyond the limits of the room.
+        // This shouldn't happen.
+        for (int i = 0; i < lasers.Count; i++)
         {
-            Rectangle laserBounds = enemies[enemyIndex].Lasers[i].GetBounds();
+            Rectangle laserBounds = lasers[i].GetBounds();
 
             if (laserBounds.Bottom >= roomBounds.Bottom)
             {
-                enemies[enemyIndex].RemoveLaser(i);
+                lasers.RemoveAt(i);
                 i--;
             }
             else if (laserBounds.Intersects(playerBounds))
             {
-                enemies[enemyIndex].RemoveLaser(i);
+                lasers.RemoveAt(i);
                 i--;
 
                 player.Death();
@@ -128,34 +140,30 @@ public static class CollisionSystem
     /// <summary>
     /// Check both enemies and player's projectiles.
     /// </summary>
-    /// <param name="enemies">
-    /// The list of enemies to check laser collision.
+    /// <param name="bullets">
+    /// A list of player's bullets.
     /// </param>
-    /// <param name="enemyIndex">
-    /// The enemy index.
-    /// </param>
-    /// <param name="player">
-    /// The player's bullet to check collision.
+    /// <param name="lasers">
+    /// A list of enemy lasers.
     /// </param>
     public static void CheckLaserVsBulletCollision(
-        List<Enemy> enemies,
-        int enemyIndex,
-        Player player
+        List<Laser> lasers,
+        List<Bullet> bullets
     )
     {
-        for (int i = 0; i < enemies[enemyIndex].Lasers.Count; i++)
+        for (int i = 0; i < lasers.Count; i++)
         {
-            Rectangle laserBounds = enemies[enemyIndex].Lasers[i].GetBounds();
+            Rectangle laserBounds = lasers[i].GetBounds();
 
-            for (int j = 0; j < player.Bullets.Count; j++)
+            for (int j = 0; j < bullets.Count; j++)
             {
-                Rectangle bulletBounds = player.Bullets[j].GetBounds();
+                Rectangle bulletBounds = bullets[j].GetBounds();
                 if (bulletBounds.Intersects(laserBounds))
                 {
-                    enemies[enemyIndex].RemoveLaser(i);
+                    lasers.RemoveAt(i);
                     i--;
 
-                    player.RemoveBullet(j);
+                    bullets.RemoveAt(j);
                     j--;
                 }
             }

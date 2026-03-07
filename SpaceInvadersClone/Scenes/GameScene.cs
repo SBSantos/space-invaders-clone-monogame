@@ -6,6 +6,7 @@ using GameLibrary.Scenes;
 using SpaceInvadersClone.GameObjects;
 using SpaceInvadersClone.Systems;
 using SpaceInvadersClone.Managers;
+using System.Collections.Generic;
 
 namespace SpaceInvadersClone.Scenes;
 
@@ -13,7 +14,11 @@ public class GameScene : Scene
 {
     private Player _player;
 
+    private List<Bullet> _bullets;
+
     private EnemyManager _enemy;
+
+    private List<Laser> _lasers;
 
     private Tilemap _tilemap;
 
@@ -105,8 +110,10 @@ public class GameScene : Scene
         bulletSprite.Scale = new(x: SCALE, y: SCALE);
 
         _player = new(playerAnimation, bulletSprite);
+        _bullets = [];
 
         _enemy = new(_tilemap);
+        _lasers = [];
         _enemy.LoadContent(atlas, SCALE);
 
         _font = Core.Content.Load<SpriteFont>("fonts/PressStart2P-Regular");
@@ -115,28 +122,39 @@ public class GameScene : Scene
     public override void Update(GameTime gameTime)
     {
         // TODO: Add your update logic here
-        _player.Update(gameTime);
+        _player.Update(gameTime, _bullets);
+
+        for (int i = 0; i < _bullets.Count; i++)
+        {
+            _bullets[i].Update();
+        }
+
         CollisionSystem.CheckPlayerHitMapEdge(_player, _roomBounds);
         CollisionSystem.CheckPlayerVsEnemyCollision(
             _player,
+            _bullets,
             _enemy.EnemyFormation.Enemies,
             _roomBounds
         );
 
-        _enemy.Update(gameTime, _player, _roomBounds);
+        _enemy.Update(gameTime, _lasers, _player, _roomBounds);
+
+        for (int i = 0; i < _lasers.Count; i++)
+        {
+            _lasers[i].Update();
+        }
+
         for (int i = 0; i < _enemy.EnemyFormation.Enemies.Count; i++)
         {
             CollisionSystem.CheckEnemyVsPlayerCollision(
                 _enemy.EnemyFormation.Enemies, i,
+                _lasers,
                 _player,
                 _roomBounds
             );
-
-            CollisionSystem.CheckLaserVsBulletCollision(
-                _enemy.EnemyFormation.Enemies, i,
-                _player
-            );
         }
+
+        CollisionSystem.CheckLaserVsBulletCollision(_lasers, _bullets);
     }
 
     public override void Draw(GameTime gameTime)
@@ -151,7 +169,17 @@ public class GameScene : Scene
 
         _player.Draw();
 
+        for (int i = 0; i < _bullets.Count; i++)
+        {
+            _bullets[i].Draw();
+        }
+
         _enemy.Draw();
+
+        for (int i = 0; i < _lasers.Count; i++)
+        {
+            _lasers[i].Draw();
+        }
 
         // Draw player score
         Core.SpriteBatch.DrawString(

@@ -31,11 +31,6 @@ public class Enemy
     public int ShootThreshold { get; set; }
 
     /// <summary>
-    /// The list of enemy's laser.
-    /// </summary>
-    public List<Laser> Lasers { get; set; }
-
-    /// <summary>
     /// Enemy score value.
     /// </summary>
     public int Score { get; set; }
@@ -50,9 +45,6 @@ public class Enemy
     /// <param name="laserSprite">
     /// The Sprite of the enemy laser.
     /// </param>
-    /// <param name="tilemap">
-    /// The tilemap.
-    /// </param>
     /// <param name="row">
     /// The value of the row where the enemy should be.
     /// </param>
@@ -64,7 +56,6 @@ public class Enemy
     {
         Sprite = sprite;
         LaserSprite = laserSprite;
-        Lasers = [];
         Row = row;
         ShootThreshold = 1300;
         Score = 0;
@@ -113,26 +104,11 @@ public class Enemy
         );
     }
 
-    private void AddLaser(Laser laser)
-    {
-        Lasers.Add(laser);
-    }
-
-    /// <summary>
-    /// Removes a enemy laser from the list.
-    /// </summary>
-    /// <param name="index">
-    /// The index of a specified laser.
-    /// </param>
-    public void RemoveLaser(int index)
-    {
-        Lasers.RemoveAt(index);
-    }
-
     /// <summary>
     /// Create a shoot a new Laser sprite.
     /// </summary>
-    public void ShootLaser()
+    /// <param name="lasers">A list of enemy lasers.</param>
+    public void ShootLaser(List<Laser> lasers)
     {
         Laser newLaser = new(LaserSprite);
 
@@ -145,29 +121,7 @@ public class Enemy
         newLaser.Position.X = Position.X + middle;
         newLaser.Position.Y = Position.Y + correctYPosition;
 
-        AddLaser(newLaser);
-    }
-
-    /// <summary>
-    /// Update the lasers.
-    /// </summary>
-    public void UpdateLaser()
-    {
-        for (int i = 0; i < Lasers.Count; i++)
-        {
-            Lasers[i].Update();
-        }
-    }
-
-    /// <summary>
-    /// Draw the lasers.
-    /// </summary>
-    public void DrawLaser()
-    {
-        for (int i = 0; i < Lasers.Count; i++)
-        {
-            Lasers[i].Draw();
-        }
+        lasers.Add(newLaser);
     }
     #endregion
 }

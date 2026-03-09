@@ -38,6 +38,9 @@ public class Core : Game
     // Input manager system
     public static InputManager Input { get; private set; }
 
+    // Time in seconds between the last frame and current.
+    public static float DeltaTime { get; private set; }
+
     // Exit the game on ESC key
     public static bool ExitOnEscape { get; set; }
 
@@ -86,6 +89,9 @@ public class Core : Game
 
     protected override void Update(GameTime gameTime)
     {
+        // Update the DeltaTime.
+        DeltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
         // Update the input manager.
         Input.Update(gameTime);
 

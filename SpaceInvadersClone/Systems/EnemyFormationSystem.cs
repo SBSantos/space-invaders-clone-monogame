@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using GameLibrary;
 using GameLibrary.Graphics;
 using Microsoft.Xna.Framework;
 using SpaceInvadersClone.GameObjects;
@@ -43,13 +44,8 @@ public class EnemyFormationSystem
     /// <param name="roomBounds">
     /// A rectangle representing the boundaries of the room.
     /// </param>
-    public void Update(
-        GameTime gameTime,
-        Rectangle roomBounds
-    )
+    public void Update(Rectangle roomBounds)
     {
-        float delta = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
         if (CollisionSystem.CheckEnemyHitMapEdge(Enemies, _direction, roomBounds))
         {
             for (int i = 0; i < Enemies.Count; i++)
@@ -64,7 +60,7 @@ public class EnemyFormationSystem
         {
             for (int i = 0; i < Enemies.Count; i++)
             {
-                Enemies[i].Position.X += Speed * _direction * delta;
+                Enemies[i].Position.X += Speed * _direction * Core.DeltaTime;
             }
         }
     }

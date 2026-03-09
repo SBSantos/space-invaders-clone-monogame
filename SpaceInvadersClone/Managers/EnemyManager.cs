@@ -168,7 +168,7 @@ public class EnemyManager
 
         // update the formation enemy group, it's movement and 
         // if hit the borders of the map.
-        EnemyFormation.Update(gameTime, roomBounds);
+        EnemyFormation.Update(roomBounds);
 
         // update the sprite and shooting time.
         _shootingTimer += gameTime.ElapsedGameTime;

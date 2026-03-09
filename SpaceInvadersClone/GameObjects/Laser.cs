@@ -1,4 +1,6 @@
+using GameLibrary;
 using GameLibrary.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace SpaceInvadersClone.GameObjects;
 
@@ -13,11 +15,11 @@ public class Laser : Projectile
     public Laser(Sprite sprite) : base(sprite)
     {
         Sprite = sprite;
-        MovementSpeed = 5.0f;
+        MovementSpeed = 250f;
     }
 
     public override void Update()
     {
-        Position.Y += MovementSpeed;
+        Position.Y += MovementSpeed * Core.DeltaTime;
     }
 }

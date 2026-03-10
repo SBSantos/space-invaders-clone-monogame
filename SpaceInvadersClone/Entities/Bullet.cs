@@ -1,8 +1,7 @@
 using GameLibrary;
 using GameLibrary.Graphics;
-using Microsoft.Xna.Framework;
 
-namespace SpaceInvadersClone.GameObjects;
+namespace SpaceInvadersClone.Entities;
 
 public class Bullet : Projectile
 {

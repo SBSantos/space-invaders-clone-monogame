@@ -3,9 +3,9 @@ using GameLibrary;
 using GameLibrary.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace SpaceInvadersClone.GameObjects;
+namespace SpaceInvadersClone.Entities;
 
-public class Enemy
+public class Enemy : Entity
 {
     #region Fields
     // The animated sprite.
@@ -13,9 +13,6 @@ public class Enemy
 
     // The Laser sprite.
     protected Sprite LaserSprite;
-
-    // The enemy position
-    public Vector2 Position;
     #endregion
 
     #region Properties

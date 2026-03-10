@@ -1,6 +1,6 @@
 using GameLibrary.Graphics;
 
-namespace SpaceInvadersClone.GameObjects;
+namespace SpaceInvadersClone.Entities;
 
 public class BigCrimson : Enemy
 {

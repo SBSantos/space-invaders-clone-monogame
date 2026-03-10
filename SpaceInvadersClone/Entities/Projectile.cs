@@ -2,9 +2,9 @@ using GameLibrary;
 using GameLibrary.Graphics;
 using Microsoft.Xna.Framework;
 
-namespace SpaceInvadersClone.GameObjects;
+namespace SpaceInvadersClone.Entities;
 
-public class Projectile
+public class Projectile : Entity
 {
     // The TextureRegion of this projectile.
     // There's no animation, in this case use TextureRegion.
@@ -13,7 +13,7 @@ public class Projectile
     /// <summary>
     /// Bullet position.
     /// </summary>
-    public Vector2 Position;
+    //public Vector2 Position;
 
     /// <summary>
     /// The Width of this projectile.

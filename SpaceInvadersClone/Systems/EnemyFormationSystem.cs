@@ -1,8 +1,9 @@
+using System;
 using System.Collections.Generic;
 using GameLibrary;
 using GameLibrary.Graphics;
 using Microsoft.Xna.Framework;
-using SpaceInvadersClone.GameObjects;
+using SpaceInvadersClone.Entities;
 
 namespace SpaceInvadersClone.Systems;
 

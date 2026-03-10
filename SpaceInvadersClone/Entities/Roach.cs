@@ -1,14 +1,15 @@
+using System;
 using GameLibrary.Graphics;
 
-namespace SpaceInvadersClone.GameObjects;
+namespace SpaceInvadersClone.Entities;
 
-public class Wavey : Enemy
+public class Roach : Enemy
 {
     /// <summary>
-    /// Create a new Wavey using the specified sprite.
+    /// Create a new Roach using the specified sprite.
     /// </summary>
     /// <param name="sprite">
-    /// The AnimatedSprite to use when drawing the wavey.
+    /// The AnimatedSprite to use when drawing the roach.
     /// </param>
     /// <param name="laserSprite">
     /// The Sprite to use when drawing the laser.
@@ -16,7 +17,7 @@ public class Wavey : Enemy
     /// <param name="row">
     /// The row value.
     /// </param>
-    public Wavey(
+    public Roach(
         AnimatedSprite sprite,
         Sprite laserSprite,
         int row
@@ -29,7 +30,7 @@ public class Wavey : Enemy
         Sprite = sprite;
         LaserSprite = laserSprite;
         Row = row;
-        Score = 30;
+        Score = 20;
     }
 
     public override void Initialize(
@@ -37,7 +38,7 @@ public class Wavey : Enemy
         float y
     )
     {
-        float enemyOffset = (Sprite.Width / 2) - 1;
+        float enemyOffset = MathF.Sqrt(Sprite.Width / 2) + 0.5f;
 
         Position = new(
             x + enemyOffset,

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using GameLibrary;
 using GameLibrary.Graphics;
 using GameLibrary.Scenes;
-using SpaceInvadersClone.GameObjects;
+using SpaceInvadersClone.Entities;
 using SpaceInvadersClone.Systems;
 using SpaceInvadersClone.Managers;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@ using GameLibrary.Graphics;
 using System.Collections.Generic;
 using System;
 
-namespace SpaceInvadersClone.GameObjects;
+namespace SpaceInvadersClone.Entities;
 
 public enum PlayerState
 {
@@ -12,7 +12,7 @@ public enum PlayerState
     Alive
 }
 
-public class Player
+public class Player : Entity
 {
     // The AnimatedSprite used to draw the player.
     private readonly AnimatedSprite _sprite;
@@ -25,9 +25,6 @@ public class Player
 
     // The threshold of the timer.
     private TimeSpan _deadPlayerTimerThreshold;
-
-    // The player position.
-    public Vector2 Position;
 
     // The player position to reset.
     public Vector2 ResetPlayerPosition;

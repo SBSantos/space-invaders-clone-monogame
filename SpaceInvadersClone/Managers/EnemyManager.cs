@@ -13,7 +13,7 @@ public class EnemyManager
     private TimeSpan _shootingTimer;
 
     // The threshold for the next shot.
-    private TimeSpan _shootingTimerThreshold;
+    private readonly TimeSpan _shootingTimerThreshold;
 
     // Randomly chooses a enemy to shoot.
     private readonly Random _random;
@@ -35,6 +35,7 @@ public class EnemyManager
         _random = new();
         _tilemap = tilemap;
         EnemyFormation = new(tilemap);
+        _shootingTimerThreshold = TimeSpan.FromMilliseconds(1300);
     }
 
     /// <summary>
@@ -53,10 +54,6 @@ public class EnemyManager
 
         for (int i = 0; i < EnemyFormation.Enemies.Count; i++)
         {
-            // Set the threshold value for the enemy to shoot
-            int thresholdValue = EnemyFormation.Enemies[0].ShootThreshold;
-            _shootingTimerThreshold = TimeSpan.FromMilliseconds(thresholdValue);
-
             x++;
 
             float xPos = x * _tilemap.TileWidth;

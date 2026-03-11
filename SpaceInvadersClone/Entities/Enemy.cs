@@ -22,12 +22,6 @@ public class Enemy : Entity
     public int Row { get; set; }
 
     /// <summary>
-    /// The time threshold value, in milliseconds,
-    /// for the enemy to shoot
-    /// </summary>
-    public int ShootThreshold { get; set; }
-
-    /// <summary>
     /// Enemy score value.
     /// </summary>
     public int Score { get; set; }
@@ -54,7 +48,6 @@ public class Enemy : Entity
         Sprite = sprite;
         LaserSprite = laserSprite;
         Row = row;
-        ShootThreshold = 1300;
         Score = 0;
     }
 

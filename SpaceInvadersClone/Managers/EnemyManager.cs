@@ -21,6 +21,12 @@ public class EnemyManager
     // The tilemap value.
     private readonly Tilemap _tilemap;
 
+    // Row value of the enemy grid.
+    private const int ROWS = 11;
+
+    // Column value of the enemy grid.
+    private const int COLUMNS = 5;
+
     /// <summary>
     /// The enemy formation system class.
     /// </summary>
@@ -43,39 +49,12 @@ public class EnemyManager
     /// </summary>
     public void Initialize()
     {
-        // The tile offset
-        const int OFFSET = 2;
-
-        // The quantity of enemies
-        const int LIMIT = 11 + OFFSET;
-
-        // The x-coordinate where the enemies should start
-        int x = OFFSET;
-
         for (int i = 0; i < EnemyFormation.Enemies.Count; i++)
         {
-            x++;
+            float x = EnemyFormation.Enemies[i].Row * _tilemap.TileWidth;
+            float y = EnemyFormation.Enemies[i].Column * _tilemap.TileHeight;
 
-            float xPos = x * _tilemap.TileWidth;
-
-            // The y-coordinate of the enemies.
-            float yPos = EnemyFormation.Enemies[i].Row * _tilemap.TileHeight;
-
-            // reset the x value to it's original value
-            if (x >= LIMIT) { x = OFFSET; }
-
-            if (EnemyFormation.Enemies[i] is Wavey)
-            {
-                EnemyFormation.Enemies[i].Initialize(xPos, yPos);
-            }
-            if (EnemyFormation.Enemies[i] is Roach)
-            {
-                EnemyFormation.Enemies[i].Initialize(xPos, yPos);
-            }
-            if (EnemyFormation.Enemies[i] is BigCrimson)
-            {
-                EnemyFormation.Enemies[i].Initialize(xPos, yPos);
-            }
+            EnemyFormation.Enemies[i].Initialize(x, y);
         }
     }
 
@@ -84,10 +63,7 @@ public class EnemyManager
     /// </summary>
     /// <param name="atlas">The texture atlas to load.</param>
     /// <param name="scale">The scale value.</param>
-    public void LoadContent(
-        TextureAtlas atlas,
-        float scale
-    )
+    public void LoadContent(TextureAtlas atlas, float scale)
     {
         // Enemy's laser
         Sprite laserSprite = atlas.CreateSprite(
@@ -95,17 +71,18 @@ public class EnemyManager
         );
         laserSprite.Scale = new(scale, scale);
 
-        // row
-        const int ROW_OFFSET = 2;
-        for (int i = 0; i < 5; i++)
+        // The enemy formation will be 2 tiles of distance to the right and below.
+        int offset = 2;
+        for (int x = 0; x < ROWS; x++)
         {
-            int row = i + ROW_OFFSET;
-            // column
-            for (int j = 0; j < 11; j++)
+            for (int y = 0; y < COLUMNS; y++)
             {
                 AnimatedSprite sprite;
 
-                if (i == 0)
+                int row = x + offset;
+                int column = y + offset;
+
+                if (y == 0)
                 {
                     sprite = atlas.CreateAnimatedSprite("wavey-animation");
                     sprite.Scale = new(scale, scale);
@@ -113,12 +90,12 @@ public class EnemyManager
                     Wavey wavey = new(
                         sprite,
                         laserSprite,
-                        row
+                        row, column
                     );
+
                     EnemyFormation.Enemies.Add(wavey);
                 }
-
-                if (i > 0 && i <= 2)
+                else if (y > 0 && y <= 2)
                 {
                     sprite = atlas.CreateAnimatedSprite("roach-animation");
                     sprite.Scale = new(scale, scale);
@@ -126,12 +103,12 @@ public class EnemyManager
                     Roach roach = new(
                         sprite,
                         laserSprite,
-                        row
+                        row, column
                     );
+
                     EnemyFormation.Enemies.Add(roach);
                 }
-
-                if (i > 2 && i < 5)
+                else if (y > 2 && y < 5)
                 {
                     sprite = atlas.CreateAnimatedSprite("bigcrimson-animation");
                     sprite.Scale = new(scale, scale);
@@ -139,9 +116,23 @@ public class EnemyManager
                     BigCrimson bigCrimson = new(
                         sprite,
                         laserSprite,
-                        row
+                        row, column
                     );
+
                     EnemyFormation.Enemies.Add(bigCrimson);
+                }
+                else
+                {
+                    sprite = atlas.CreateAnimatedSprite("roach-animation");
+                    sprite.Scale = new(scale, scale);
+
+                    Roach roach = new(
+                        sprite,
+                        laserSprite,
+                        row, column
+                    );
+
+                    EnemyFormation.Enemies.Add(roach);
                 }
             }
         }

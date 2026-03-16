@@ -16,32 +16,31 @@ public class BigCrimson : Enemy
     /// <param name="row">
     /// The row value.
     /// </param>
+    /// <param name="column">
+    /// The column value.
+    /// </param>
     public BigCrimson(
         AnimatedSprite sprite,
         Sprite laserSprite,
-        int row
+        int row,
+        int column
     ) : base(
         sprite,
         laserSprite,
-        row
+        row,
+        column
     )
     {
         Sprite = sprite;
         LaserSprite = laserSprite;
         Row = row;
+        Column = column;
         Score = 10;
     }
 
-    public override void Initialize(
-        float x,
-        float y
-    )
+    public override void Initialize(float x, float y)
     {
         float enemyOffset = 1;
-
-        Position = new(
-            x + enemyOffset,
-            y
-        );
+        Position = new(x + enemyOffset, y);
     }
 }

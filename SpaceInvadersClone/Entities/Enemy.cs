@@ -22,6 +22,11 @@ public class Enemy : Entity
     public int Row { get; set; }
 
     /// <summary>
+    /// Gets or Set the column of multiples enemies,
+    /// </summary>
+    public int Column { get; set; }
+
+    /// <summary>
     /// Enemy score value.
     /// </summary>
     public int Score { get; set; }
@@ -39,15 +44,20 @@ public class Enemy : Entity
     /// <param name="row">
     /// The value of the row where the enemy should be.
     /// </param>
+    /// <param name="column">
+    /// The value of the column where the enemy should be.
+    /// </param>
     public Enemy(
         AnimatedSprite sprite,
         Sprite laserSprite,
-        int row
+        int row,
+        int column
     )
     {
         Sprite = sprite;
         LaserSprite = laserSprite;
         Row = row;
+        Column = column;
         Score = 0;
     }
 

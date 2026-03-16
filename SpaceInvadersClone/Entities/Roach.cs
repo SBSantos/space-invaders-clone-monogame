@@ -17,32 +17,31 @@ public class Roach : Enemy
     /// <param name="row">
     /// The row value.
     /// </param>
+    /// <param name="column">
+    /// The column value.
+    /// </param>
     public Roach(
         AnimatedSprite sprite,
         Sprite laserSprite,
-        int row
+        int row,
+        int column
     ) : base(
         sprite,
         laserSprite,
-        row
+        row,
+        column
     )
     {
         Sprite = sprite;
         LaserSprite = laserSprite;
         Row = row;
+        Column = column;
         Score = 20;
     }
 
-    public override void Initialize(
-        float x,
-        float y
-    )
+    public override void Initialize(float x, float y)
     {
         float enemyOffset = MathF.Sqrt(Sprite.Width / 2) + 0.5f;
-
-        Position = new(
-            x + enemyOffset,
-            y
-        );
+        Position = new(x + enemyOffset, y);
     }
 }

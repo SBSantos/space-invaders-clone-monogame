@@ -39,6 +39,8 @@ public static class CollisionSystem
 
             for (int j = 0; j < enemies.Count; j++)
             {
+                if (!enemies[j].IsActive) { continue; }
+
                 Rectangle enemyBounds = enemies[j].GetBounds();
                 if (bulletBounds.Intersects(enemyBounds))
                 {
@@ -47,8 +49,7 @@ public static class CollisionSystem
                     bullets.RemoveAt(i);
                     i--;
 
-                    enemies.RemoveAt(j);
-                    j--;
+                    enemies[j].Deactivate();
                 }
             }
         }
@@ -189,6 +190,8 @@ public static class CollisionSystem
     {
         for (int i = 0; i < enemies.Count; i++)
         {
+            if (!enemies[i].IsActive) { continue; }
+
             Rectangle enemyBounds = enemies[i].GetBounds();
 
             float leftSidePos = enemyBounds.X - (enemyBounds.Width / 2);

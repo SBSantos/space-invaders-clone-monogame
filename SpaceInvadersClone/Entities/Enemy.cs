@@ -79,6 +79,8 @@ public class Enemy : Entity
     /// </param>
     public virtual void Update(GameTime gameTime)
     {
+        if (!IsActive) { return; }
+
         Sprite.Update(gameTime);
     }
 
@@ -87,6 +89,8 @@ public class Enemy : Entity
     /// </summary>
     public virtual void Draw()
     {
+        if (!IsActive) { return; }
+
         Sprite.Draw(Core.SpriteBatch, Position);
     }
 

@@ -6,9 +6,16 @@ public class Entity
 {
     public Vector2 Position;
 
-    public bool IsActive;
+    /// <summary>
+    /// Define whether an entity is active or not.
+    /// The value is true by default.
+    /// </summary>
+    public bool IsActive { get; set; } = true;
 
-    public void Remove()
+    /// <summary>
+    /// Deactivate an entity by setting IsActive to false.
+    /// </summary>
+    public void Deactivate()
     {
         IsActive = false;
     }

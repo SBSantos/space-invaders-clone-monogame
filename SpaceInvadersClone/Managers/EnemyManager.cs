@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameLibrary.Graphics;
 using Microsoft.Xna.Framework;
 using SpaceInvadersClone.Entities;
@@ -31,6 +32,11 @@ public class EnemyManager
     /// The enemy formation system class.
     /// </summary>
     public EnemyFormationSystem EnemyFormation { get; }
+
+    /// <summary>
+    /// A list of active enemies.
+    /// </summary>
+    private List<Enemy> ActiveEnemiesList => EnemyFormation.Enemies.Where(x => x.IsActive).ToList();
 
     /// <summary>
     /// Create a new EnemyManager.
@@ -158,18 +164,20 @@ public class EnemyManager
         // if hit the borders of the map.
         EnemyFormation.Update(roomBounds);
 
-        // update the sprite and shooting time.
-        _shootingTimer += gameTime.ElapsedGameTime;
+        // update the sprite 
         for (int i = 0; i < EnemyFormation.Enemies.Count; i++)
         {
-            EnemyFormation.Enemies[i].Update(gameTime);
+            if (!EnemyFormation.Enemies[i].IsActive) { continue; }
 
-            if (_shootingTimer >= _shootingTimerThreshold)
-            {
-                int index = _random.Next(EnemyFormation.Enemies.Count);
-                EnemyFormation.Enemies[index].ShootLaser(lasers);
-                _shootingTimer -= _shootingTimerThreshold;
-            }
+            EnemyFormation.Enemies[i].Update(gameTime);
+        }
+
+        // update the shooting timer
+        _shootingTimer += gameTime.ElapsedGameTime;
+        if (_shootingTimer >= _shootingTimerThreshold)
+        {
+            RandomEnemyShoot(lasers);
+            _shootingTimer -= _shootingTimerThreshold;
         }
     }
 
@@ -180,7 +188,17 @@ public class EnemyManager
     {
         for (int i = 0; i < EnemyFormation.Enemies.Count; i++)
         {
+            if (!EnemyFormation.Enemies[i].IsActive) { continue; }
+
             EnemyFormation.Enemies[i].Draw();
+        }
+    }
+    private void RandomEnemyShoot(List<Laser> lasers)
+    {
+        if (ActiveEnemiesList.Count > 0)
+        {
+            int index = _random.Next(ActiveEnemiesList.Count);
+            ActiveEnemiesList[index].ShootLaser(lasers);
         }
     }
 }

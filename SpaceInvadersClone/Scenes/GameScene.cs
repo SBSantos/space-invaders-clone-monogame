@@ -34,6 +34,8 @@ public class GameScene : Scene
 
     private Vector2 _livesTextOrigin;
 
+    private float _playerDeathtimer;
+
     public override void Initialize()
     {
         // TODO: Add your initialization logic here
@@ -122,6 +124,21 @@ public class GameScene : Scene
     public override void Update(GameTime gameTime)
     {
         // TODO: Add your update logic here
+
+        if (!_player.IsActive)
+        {
+            if (_player.Lives > 0)
+            {
+                _playerDeathtimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (_playerDeathtimer >= 3)
+                {
+                    _player.IsActive = true;
+                    _playerDeathtimer = 0;
+                }
+            }
+            return;
+        }
+
         _player.Update(gameTime, _bullets);
 
         for (int i = 0; i < _bullets.Count; i++)
@@ -137,20 +154,16 @@ public class GameScene : Scene
             _roomBounds
         );
 
-        _enemy.Update(gameTime, _lasers, _player, _roomBounds);
+        _enemy.Update(gameTime, _lasers, _roomBounds);
 
         for (int i = 0; i < _lasers.Count; i++)
         {
             _lasers[i].Update();
         }
 
-        for (int i = 0; i < _enemy.EnemyFormation.Enemies.Count; i++)
-        {
-            CollisionSystem.CheckEnemyVsPlayerCollision(
-                _enemy.EnemyFormation.Enemies, i,
-                _player
-            );
-        }
+        CollisionSystem.CheckEnemyVsPlayerCollision(
+            _enemy.EnemyFormation.Enemies, _player
+        );
 
         CollisionSystem.CheckLaserVsPlayerCollision(
             _lasers,

@@ -86,26 +86,26 @@ public static class CollisionSystem
     /// <param name="enemies">
     /// The list of enemies to check collision.
     /// </param>
-    /// <param name="enemyIndex">
-    /// The enemy index.
-    /// </param>
     /// <param name="player">
     /// The player to check collision.
     /// </param>
     public static void CheckEnemyVsPlayerCollision(
         List<Enemy> enemies,
-        int enemyIndex,
         Player player
     )
     {
-        Rectangle enemyBounds = enemies[enemyIndex].GetBounds();
-
         Rectangle playerBounds = player.GetBounds();
 
-        if (enemyBounds.Intersects(playerBounds))
+        for (int i = 0; i < enemies.Count; i++)
         {
-            // Player's death logic here, but to avoid infinite death 
-            // this will be blanked.
+            if (!enemies[i].IsActive) { continue; }
+
+            Rectangle enemyBounds = enemies[i].GetBounds();
+
+            if (enemyBounds.Intersects(playerBounds))
+            {
+                player.Death();
+            }
         }
     }
 
@@ -145,11 +145,11 @@ public static class CollisionSystem
     /// <summary>
     /// Check both enemies and player's projectiles.
     /// </summary>
-    /// <param name="bullets">
-    /// A list of player's bullets.
-    /// </param>
     /// <param name="lasers">
     /// A list of enemy lasers.
+    /// </param>
+    /// <param name="bullets">
+    /// A list of player's bullets.
     /// </param>
     public static void CheckLaserVsBulletCollision(
         List<Laser> lasers,
@@ -203,12 +203,9 @@ public static class CollisionSystem
                     return true;
                 }
             }
-            else
+            else if (leftSidePos <= roomBounds.Left)
             {
-                if (leftSidePos <= roomBounds.Left)
-                {
-                    return true;
-                }
+                return true;
             }
         }
 

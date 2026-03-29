@@ -2,15 +2,8 @@ using Microsoft.Xna.Framework;
 using GameLibrary;
 using GameLibrary.Graphics;
 using System.Collections.Generic;
-using System;
 
 namespace SpaceInvadersClone.Entities;
-
-public enum PlayerState
-{
-    Dead,
-    Alive
-}
 
 public class Player : Entity
 {
@@ -20,14 +13,14 @@ public class Player : Entity
     // The bullet sprite.
     private readonly Sprite _bullet;
 
-    // The timer when the player is dead.
-    private TimeSpan _deadPlayerTimer;
+    // Defines if the player is or not immortal.
+    private bool _isImmortal;
 
-    // The threshold of the timer.
-    private TimeSpan _deadPlayerTimerThreshold;
+    // The timer of player's immortality.
+    private float _immortalTimer;
 
     // The player position to reset.
-    public Vector2 ResetPlayerPosition;
+    private Vector2 _resetPlayerPosition;
 
     private const float MOVEMENT_SPEED = 5.0f;
 
@@ -42,11 +35,6 @@ public class Player : Entity
     public int Lives { get; set; }
 
     /// <summary>
-    /// Gets or sets the player's state.
-    /// </summary>
-    public PlayerState PlayerState { get; set; }
-
-    /// <summary>
     /// Creates a new Player using the specified sprite.
     /// </summary>
     /// <param name="sprite">
@@ -59,10 +47,9 @@ public class Player : Entity
     {
         _sprite = sprite;
         _bullet = bulletSprite;
+        _isImmortal = false;
         Score = 0;
         Lives = 3;
-        PlayerState = PlayerState.Alive;
-        _deadPlayerTimerThreshold = TimeSpan.FromSeconds(3);
     }
 
     /// <summary>
@@ -72,7 +59,7 @@ public class Player : Entity
     public void Initialize(Vector2 startingPosition)
     {
         Position = startingPosition;
-        ResetPlayerPosition = startingPosition;
+        _resetPlayerPosition = startingPosition;
     }
 
     // Handles input given by the player.
@@ -110,26 +97,20 @@ public class Player : Entity
     /// </param>
     public void Update(GameTime gameTime, List<Bullet> bullets)
     {
-        // Stop updating
-        if (Lives <= 0) { return; }
-
         // Update the animated sprite.
         _sprite.Update(gameTime);
 
-        // When player state is dead state, switch it to alive state.
-        if (PlayerState == PlayerState.Dead)
+        // Handle any player input.
+        HandleInput(bullets);
+
+        if (_isImmortal)
         {
-            _deadPlayerTimer += gameTime.ElapsedGameTime;
-            if (_deadPlayerTimer >= _deadPlayerTimerThreshold)
+            _immortalTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (_immortalTimer > 3)
             {
-                PlayerState = PlayerState.Alive;
-                _deadPlayerTimer = TimeSpan.Zero;
+                _isImmortal = false;
+                _immortalTimer = 0;
             }
-        }
-        else
-        {
-            // Handle any player input.
-            HandleInput(bullets);
         }
     }
 
@@ -139,7 +120,7 @@ public class Player : Entity
     public void Draw()
     {
         // Stop drawing the player.
-        if (Lives <= 0 || PlayerState == PlayerState.Dead) { return; }
+        if (!IsActive) { return; }
 
         _sprite.Draw(Core.SpriteBatch, Position);
     }
@@ -203,9 +184,14 @@ public class Player : Entity
     /// </summary>
     public void Death()
     {
-        // if player is dead, make it imortal for a little time.
+        // if player is dead, make it immortal for a little time.
+        if (_isImmortal) { return; }
 
         Lives--;
-        PlayerState = PlayerState.Dead;
+        Deactivate();
+
+        Position = _resetPlayerPosition;
+
+        _isImmortal = true;
     }
 }

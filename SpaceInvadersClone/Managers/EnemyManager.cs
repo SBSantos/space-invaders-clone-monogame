@@ -149,17 +149,13 @@ public class EnemyManager
     /// </summary>
     /// <param name="gameTime">A snapshot of the timing values for current update cycle.</param>
     /// <param name="lasers">A list of enemy lasers.</param>
-    /// <param name="player">The player.</param>
     /// <param name="roomBounds">A rectangle representing the boundaries of the room.</param>
     public void Update(
         GameTime gameTime,
         List<Laser> lasers,
-        Player player,
         Rectangle roomBounds
     )
     {
-        if (player.PlayerState == PlayerState.Dead) { return; }
-
         // update the formation enemy group, it's movement and 
         // if hit the borders of the map.
         EnemyFormation.Update(roomBounds);
@@ -193,6 +189,7 @@ public class EnemyManager
             EnemyFormation.Enemies[i].Draw();
         }
     }
+
     private void RandomEnemyShoot(List<Laser> lasers)
     {
         if (ActiveEnemiesList.Count > 0)

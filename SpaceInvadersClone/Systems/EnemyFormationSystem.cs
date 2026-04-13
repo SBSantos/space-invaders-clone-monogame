@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using GameLibrary;
 using GameLibrary.Graphics;
@@ -11,7 +10,7 @@ public class EnemyFormationSystem
 {
     // Enemies direction.
     // 1 = right, -1 = left.
-    public int _direction;
+    private int _direction;
 
     /// <summary>
     /// List of enemy.

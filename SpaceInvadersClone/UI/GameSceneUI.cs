@@ -1,4 +1,3 @@
-using System.ComponentModel.Design.Serialization;
 using GameLibrary;
 using GameLibrary.Graphics;
 using Microsoft.Xna.Framework;
@@ -9,9 +8,9 @@ namespace SpaceInvadersClone.UI;
 
 public class GameSceneUI
 {
-    private readonly string scoreFormat = "SCORE: {0:D6}";
+    private readonly string _scoreFormat = "SCORE: {0:D6}";
 
-    private readonly string livesFormat = "Lives: {0}";
+    private readonly string _livesFormat = "Lives: {0}";
 
     private readonly SpriteFont _font;
 
@@ -82,7 +81,7 @@ public class GameSceneUI
             tilemap.TileHeight / 2
         );
 
-        float scoreTextYOrigin = _font.MeasureString(scoreFormat).Y / 2;
+        float scoreTextYOrigin = _font.MeasureString(_scoreFormat).Y / 2;
         _scoreTextOrigin = new(0, scoreTextYOrigin);
 
         _livesTextPosition = new(
@@ -93,7 +92,7 @@ public class GameSceneUI
         _dropShadowColor = Color.Black;
         _dropShadowOffset = new(2, 2);
 
-        float livesTextYOrigin = _font.MeasureString(livesFormat).Y / 2;
+        float livesTextYOrigin = _font.MeasureString(_livesFormat).Y / 2;
         _livesTextOrigin = new(0, livesTextYOrigin);
 
         _pauseText = "GAME PAUSED";
@@ -123,7 +122,7 @@ public class GameSceneUI
 
         Core.SpriteBatch.DrawString(
             _font,
-            string.Format(scoreFormat, _player.Score),
+            string.Format(_scoreFormat, _player.Score),
             _scoreTextPosition,
             Color.White,
             0.0f,
@@ -135,7 +134,7 @@ public class GameSceneUI
 
         Core.SpriteBatch.DrawString(
             _font,
-            string.Format(livesFormat, _player.Lives),
+            string.Format(_livesFormat, _player.Lives),
             _livesTextPosition,
             Color.White,
             0.0f,

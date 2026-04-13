@@ -154,7 +154,7 @@ public class TitleScene : Scene
     public override void Update(GameTime gameTime)
     {
         // If the user presses enter, switch to the game scene.
-        if (Core.Input.Keyboard.WasKeyJustPressed(Keys.Enter))
+        if (GameController.Action())
         {
             Core.ChangeScene(new GameScene());
         }

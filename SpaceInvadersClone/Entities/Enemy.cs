@@ -79,8 +79,6 @@ public class Enemy : Entity
     /// </param>
     public virtual void Update(GameTime gameTime)
     {
-        if (!IsActive) { return; }
-
         Sprite.Update(gameTime);
     }
 

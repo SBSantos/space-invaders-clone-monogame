@@ -11,7 +11,7 @@ public class EnemyFormationSystem
 {
     // Enemies direction.
     // 1 = right, -1 = left.
-    private int _direction;
+    public int _direction;
 
     /// <summary>
     /// List of enemy.
@@ -30,18 +30,22 @@ public class EnemyFormationSystem
 
     public EnemyFormationSystem(Tilemap tilemap)
     {
-        _direction = 1;
         Enemies = [];
         Speed = 20f;
         Descend = tilemap.TileHeight;
     }
 
     /// <summary>
+    /// Initialize the direction value to 1.
+    /// </summary>
+    public void Initialize()
+    {
+        _direction = 1;
+    }
+
+    /// <summary>
     /// Update the enemy movement.
     /// </summary>
-    /// <param name="gameTime">
-    /// A snapshot of the timing values for current update cycle.
-    /// </param>
     /// <param name="roomBounds">
     /// A rectangle representing the boundaries of the room.
     /// </param>

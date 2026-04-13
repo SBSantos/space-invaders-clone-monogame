@@ -55,11 +55,14 @@ public class EnemyManager
     /// </summary>
     public void Initialize()
     {
+        EnemyFormation.Initialize();
+
         for (int i = 0; i < EnemyFormation.Enemies.Count; i++)
         {
             float x = EnemyFormation.Enemies[i].Row * _tilemap.TileWidth;
             float y = EnemyFormation.Enemies[i].Column * _tilemap.TileHeight;
 
+            EnemyFormation.Enemies[i].IsActive = true;
             EnemyFormation.Enemies[i].Initialize(x, y);
         }
     }
@@ -163,8 +166,6 @@ public class EnemyManager
         // update the sprite 
         for (int i = 0; i < EnemyFormation.Enemies.Count; i++)
         {
-            if (!EnemyFormation.Enemies[i].IsActive) { continue; }
-
             EnemyFormation.Enemies[i].Update(gameTime);
         }
 
@@ -198,4 +199,10 @@ public class EnemyManager
             ActiveEnemiesList[index].ShootLaser(lasers);
         }
     }
+
+    /// <summary>
+    /// Returns true if all the enemies are dead.
+    /// </summary>
+    public bool AllEnemiesDefeated()
+        => ActiveEnemiesList.All(x => !x.IsActive);
 }

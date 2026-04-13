@@ -7,12 +7,24 @@ using SpaceInvadersClone.Entities;
 using SpaceInvadersClone.Systems;
 using SpaceInvadersClone.Managers;
 using System.Collections.Generic;
+using SpaceInvadersClone.UI;
+using System;
 
 namespace SpaceInvadersClone.Scenes;
 
 public class GameScene : Scene
 {
+    private enum GameState
+    {
+        Winner,
+        Playing,
+        Paused,
+        GameOver
+    }
+
     private Player _player;
+
+    private Vector2 _playerPosition;
 
     private List<Bullet> _bullets;
 
@@ -24,17 +36,19 @@ public class GameScene : Scene
 
     private Rectangle _roomBounds;
 
-    private SpriteFont _font;
-
-    private Vector2 _scoreTextPosition;
-
-    private Vector2 _scoreTextOrigin;
-
-    private Vector2 _livesTextPosition;
-
-    private Vector2 _livesTextOrigin;
-
     private float _playerDeathtimer;
+
+    private float _endGameTimer;
+
+    private GameState _gameState;
+
+    private GameSceneUI _ui;
+
+    private Effect _grayscaleEffect;
+
+    private float _saturation = 1.0f;
+
+    private const float FADE_SPEED = 0.1f;
 
     public override void Initialize()
     {
@@ -60,29 +74,26 @@ public class GameScene : Scene
         int row = (int)(_tilemap.Rows / PLAYER_ROW);
         int playerColumn = _tilemap.Columns / 2;
 
-        Vector2 playerPosition = new(
+        _playerPosition = new(
             playerColumn * _tilemap.TileWidth,
             row * _tilemap.TileHeight
         );
-        _player.Initialize(playerPosition);
 
+        _ui.Initialize(_roomBounds, _tilemap);
+
+        NewGame();
+    }
+
+    private void NewGame()
+    {
+        _player.IsActive = true;
+        _player.Lives = 3;
+        _player.Score = 0;
+
+        _player.Initialize(_playerPosition);
         _enemy.Initialize();
 
-        _scoreTextPosition = new(
-            _roomBounds.Left,
-            _tilemap.TileHeight / 2
-        );
-
-        float scoreTextYOrigin = _font.MeasureString("Score").Y / 2;
-        _scoreTextOrigin = new(0, scoreTextYOrigin);
-
-        _livesTextPosition = new(
-            _roomBounds.Center.X * 1.5f,
-            _tilemap.TileHeight / 2
-        );
-
-        float livesTextYOrigin = _font.MeasureString("Lives").Y / 2;
-        _livesTextOrigin = new(0, livesTextYOrigin);
+        _gameState = GameState.Playing;
     }
 
     public override void LoadContent()
@@ -118,13 +129,62 @@ public class GameScene : Scene
         _lasers = [];
         _enemy.LoadContent(atlas, SCALE);
 
-        _font = Core.Content.Load<SpriteFont>("fonts/PressStart2P-Regular");
+        _ui = new(_player);
+
+        _grayscaleEffect = Content.Load<Effect>("effects/grayscaleEffect");
     }
+
 
     public override void Update(GameTime gameTime)
     {
         // TODO: Add your update logic here
+        if (_gameState == GameState.Winner)
+        {
+            _endGameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+            if (_endGameTimer >= 5)
+            {
+                _ui.HideVictoryScreen();
+                NewGame();
+                _endGameTimer = 0;
+            }
+            return;
+        }
 
+        if (_gameState != GameState.Playing && _gameState != GameState.Winner)
+        {
+            // This is either Pause or Game Over state
+            _saturation = Math.Max(0.0f, _saturation - FADE_SPEED);
+
+            if (_gameState == GameState.GameOver)
+            {
+                _endGameTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (_endGameTimer >= 5)
+                {
+                    _ui.HideGameOverScreen();
+                    Core.ChangeScene(new TitleScene());
+                    _endGameTimer = 0;
+                }
+                return;
+            }
+        }
+
+        // Pause
+        if (GameController.Pause()) { TogglePause(); }
+
+        if (_gameState == GameState.Paused)
+        {
+            if (GameController.Quit())
+            {
+                Core.ChangeScene(new TitleScene());
+            }
+            return;
+        }
+
+        // Game Win/Over
+        CheckWinGame();
+        CheckGameOver();
+
+        // Player
         if (!_player.IsActive)
         {
             if (_player.Lives > 0)
@@ -154,6 +214,7 @@ public class GameScene : Scene
             _roomBounds
         );
 
+        // Enemy
         _enemy.Update(gameTime, _lasers, _roomBounds);
 
         for (int i = 0; i < _lasers.Count; i++)
@@ -180,7 +241,17 @@ public class GameScene : Scene
 
         // TODO: Add your drawing code here
 
-        Core.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        if (_gameState != GameState.Playing && _gameState != GameState.Winner)
+        {
+            // If its a Game Over or Pause state, apply the saturation parameter.
+            _grayscaleEffect.Parameters["Saturation"].SetValue(_saturation);
+
+            Core.SpriteBatch.Begin(samplerState: SamplerState.PointClamp, effect: _grayscaleEffect);
+        }
+        else
+        {
+            Core.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        }
 
         _tilemap.Draw(Core.SpriteBatch);
 
@@ -198,34 +269,44 @@ public class GameScene : Scene
             _lasers[i].Draw();
         }
 
-        // Draw player score
-        Core.SpriteBatch.DrawString(
-            _font,
-            $"Score: {_player.Score}",
-            _scoreTextPosition,
-            Color.White,
-            0.0f,
-            _scoreTextOrigin,
-            1.0f,
-            SpriteEffects.None,
-            0.0f
-        );
-
-        // Draw player lives count
-        Core.SpriteBatch.DrawString(
-            _font,
-            $"Lives: {_player.Lives}",
-            _livesTextPosition,
-            Color.White,
-            0.0f,
-            _livesTextOrigin,
-            1.0f,
-            SpriteEffects.None,
-            0.0f
-        );
-
         Core.SpriteBatch.End();
 
+        _ui.Draw();
+
         base.Draw(gameTime);
+    }
+
+    private void CheckWinGame()
+    {
+        if (_enemy.AllEnemiesDefeated())
+        {
+            _ui.ShowVictoryScreen();
+            _gameState = GameState.Winner;
+        }
+    }
+
+    private void CheckGameOver()
+    {
+        if (_player.NoLivesLeft())
+        {
+            _ui.ShowGameOverScreen();
+            _gameState = GameState.GameOver;
+            _saturation = 1.0f;
+        }
+    }
+
+    private void TogglePause()
+    {
+        if (_gameState == GameState.Paused)
+        {
+            _ui.HidePauseScreen();
+            _gameState = GameState.Playing;
+        }
+        else
+        {
+            _ui.ShowPauseScreen();
+            _gameState = GameState.Paused;
+            _saturation = 1.0f;
+        }
     }
 }

@@ -194,4 +194,10 @@ public class Player : Entity
 
         _isImmortal = true;
     }
+
+    /// <summary>
+    /// Return true if theres no lives left.
+    /// </summary>
+    public bool NoLivesLeft()
+        => Lives <= 0;
 }

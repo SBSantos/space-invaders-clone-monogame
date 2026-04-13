@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using GameLibrary;
 using GameLibrary.Input;
+using System;
 
 namespace SpaceInvadersClone;
 
@@ -38,8 +39,8 @@ public static class GameController
     /// </summary>
     public static bool Pause()
     {
-        return Keyboard.IsKeyDown(Keys.Escape) ||
-               GamePad.IsButtonDown(Buttons.Start);
+        return Keyboard.WasKeyJustPressed(Keys.Escape) ||
+               GamePad.WasButtonJustPressed(Buttons.Start);
     }
 
     /// <summary>
@@ -47,8 +48,8 @@ public static class GameController
     /// </summary>
     public static bool Action()
     {
-        return Keyboard.IsKeyDown(Keys.Enter) ||
-               GamePad.IsButtonDown(Buttons.A);
+        return Keyboard.WasKeyJustPressed(Keys.Enter) ||
+               GamePad.WasButtonJustPressed(Buttons.A);
     }
 
     /// <summary>
@@ -62,22 +63,10 @@ public static class GameController
     }
 
     /// <summary>
-    /// Returns mouse xy-position to control the player.
+    /// Return true if the player has triggered the "quit" action.
     /// </summary>
-    /// <returns>The mouse x and y position.</returns>
-    public static Vector2 MousePosition()
+    public static bool Quit()
     {
-        return Mouse.Position.ToVector2();
-    }
-
-    /// <summary>
-    /// Returns true if the mouse was moved
-    /// </summary>
-    /// <returns>
-    /// True if it was moved. Otherwise, false.
-    /// </returns>
-    public static bool WasMouseMoved()
-    {
-        return Mouse.WasMoved;
+        return Keyboard.WasKeyJustPressed(Keys.Q);
     }
 }
